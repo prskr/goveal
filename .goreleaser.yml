@@ -1,0 +1,53 @@
+project_name: goveal
+before:
+  hooks:
+    - mkdir -p ./assets/reveal
+    - ./download_revealjs.sh
+    - go mod download
+    - go build -v ./...
+    - go get -u github.com/gobuffalo/packr/v2/packr2
+    - packr2
+builds:
+  - main: ./cmd/goveal/main.go
+    binary: goveal
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    ldflags:
+      - -w -s
+    env:
+      - CGO_ENABLED=0
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: linux
+        goarch: arm
+        goarm: 7
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

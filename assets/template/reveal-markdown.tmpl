@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>goveal</title>
+
+    <link rel="stylesheet" href="/reveal/css/reveal.css">
+    <link rel="stylesheet" href="/reveal/css/theme/{{ .Reveal.Theme }}.css" id="theme">
+
+    <link rel="stylesheet" href="/reveal/lib/css/{{ .Reveal.CodeTheme }}.css">
+</head>
+
+<body>
+
+<div class="reveal">
+    <div class="slides">
+        <!-- Slides are separated by newline + three dashes + newline, vertical slides identical but two dashes -->
+        <section data-markdown data-separator="^\n{{ .Reveal.HorizontalSeparator }}\n"
+                 data-separator-vertical="^\n{{ .Reveal.VerticalSeparator }}\n">
+            <script type="text/template">
+                {{ .MarkdownBody }}
+            </script>
+        </section>
+    </div>
+</div>
+
+<script src="/reveal/js/reveal.js"></script>
+
+<script>
+
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: '/reveal/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '/reveal/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: '/reveal/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '/reveal/plugin/notes/notes.js' }
+				]
+			});
+
+
+</script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-// Copyright © 2019 Peter Kurfer
+// Copyright © 2019 Peter Kurfer peter.kurfer@googlemail.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package config
 
-import "github.com/baez90/go-reveal-slides/cmd"
+import "github.com/spf13/viper"
 
-func main() {
-	cmd.Execute()
+type RevealParams struct {
+	Theme               string
+	CodeTheme           string
+	HorizontalSeparator string
+	VerticalSeparator   string
+}
+
+func (params *RevealParams) Load() {
+	params.Theme = viper.GetString("theme")
+	params.CodeTheme = viper.GetString("code-theme")
+	params.HorizontalSeparator = viper.GetString("horizontal-separator")
+	params.VerticalSeparator = viper.GetString("vertical-separator")
 }

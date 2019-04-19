@@ -10,3 +10,20 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# Jetbrainse
+.idea/
+
+# VSCode
+.vscode/
+.history
+
+assets/reveal
+
+# packr2 generated
+*-packr.go
+
+# binaries
+goveal
+
+!goveal/
