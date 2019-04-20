@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package template
+package rendering
 
 import (
-	"fmt"
 	"github.com/baez90/go-reveal-slides/internal/app/config"
 	"github.com/gobuffalo/packr/v2"
-	"html/template"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path"
-
 	log "github.com/sirupsen/logrus"
+	"html/template"
+	"net/http"
 )
 
 type RevealRenderer interface {
@@ -32,21 +27,9 @@ type RevealRenderer interface {
 	init() error
 }
 
-func NewRevealRenderer(markdownPath string, params *config.RevealParams) (renderer RevealRenderer, err error) {
-	var info os.FileInfo
-	info, err = os.Stat(markdownPath)
-	if err != nil {
-		return
-	}
-
-	if info.IsDir() || path.Ext(info.Name()) != ".md" {
-		err = fmt.Errorf("path %s did not pass sanity checks for markdown files", markdownPath)
-		return
-	}
-
+func NewRevealRenderer(params *config.RevealParams) (renderer RevealRenderer, err error) {
 	renderer = &revealRenderer{
-		markdownPath: markdownPath,
-		params:       params,
+		params: params,
 	}
 	err = renderer.init()
 
@@ -54,14 +37,13 @@ func NewRevealRenderer(markdownPath string, params *config.RevealParams) (render
 }
 
 type revealRenderer struct {
-	markdownPath     string
 	template         *template.Template
 	renderedTemplate string
 	params           *config.RevealParams
 }
 
 func (renderer *revealRenderer) init() (err error) {
-	templateBox := packr.New("template", "./../../../assets/template")
+	templateBox := packr.New("rendering", "./../../../assets/template")
 	templateString, err := templateBox.FindString("reveal-markdown.tmpl")
 	if err != nil {
 		return
@@ -74,25 +56,17 @@ func (renderer *revealRenderer) init() (err error) {
 func (renderer *revealRenderer) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 
 	if renderer.template == nil {
-		writeErrorResponse(500, "template is not set - probably error during startup", response)
+		writeErrorResponse(500, "rendering is not set - probably error during startup", response)
 		return
 	}
 
-	markdownContent, err := ioutil.ReadFile(renderer.markdownPath)
-	if err != nil {
-		writeErrorResponse(500, "failed to read markdown content", response)
-		log.Errorf("Failed to read markdown content: %v", err)
-		return
-	}
-
-	err = renderer.template.Execute(response, struct {
-		Reveal       config.RevealParams
-		MarkdownBody string
-	}{Reveal: *renderer.params, MarkdownBody: string(markdownContent)})
+	err := renderer.template.Execute(response, struct {
+		Reveal config.RevealParams
+	}{Reveal: *renderer.params})
 
 	if err != nil {
-		writeErrorResponse(500, "Failed to render Markdown to template", response)
-		log.Errorf("Failed to render Markdown template: %v", err)
+		writeErrorResponse(500, "Failed to render Markdown to rendering", response)
+		log.Errorf("Failed to render Markdown rendering: %v", err)
 	}
 }
 

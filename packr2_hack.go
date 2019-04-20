@@ -16,5 +16,5 @@ package go_reveal_slides
 
 import (
 	_ "github.com/baez90/go-reveal-slides/internal/app/cmd"
-	_ "github.com/baez90/go-reveal-slides/internal/app/template"
+	_ "github.com/baez90/go-reveal-slides/internal/app/rendering"
 )

@@ -4,8 +4,6 @@
 
 Content 1.1
 
-asdf
-
 Note: This will only appear in the speaker notes window.
 
 ---
@@ -43,3 +41,9 @@ Content 3.2
 ## External 4.1
 
 ![Local image](/local/examples/gopher.jpg)
+
+---
+
+## External 4.2
+
+<a href="https://www.google.com">Google</a>

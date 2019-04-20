@@ -16,7 +16,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/baez90/go-reveal-slides/internal/app/template"
+	"github.com/baez90/go-reveal-slides/internal/app/rendering"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/spf13/cobra"
 	"net/http"
@@ -35,26 +35,38 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			tmplRenderer, err := template.NewRevealRenderer(args[0], &params)
+			tmplRenderer, err := rendering.NewRevealRenderer(&params)
 
 			if err != nil {
 				log.Errorf("Failed to initialize reveal renderer due to error: %v", err)
 				os.Exit(1)
 			}
 
+			markdownHandler, err := rendering.NewMarkdownHandler(args[0])
+			if err != nil {
+				log.Errorf("Failed to initialize reveal renderer due to error: %v", err)
+				os.Exit(1)
+			}
+
+			// Packr2 handler to serve Reveal.js assets
 			log.Info("Setup reveal assets under route /reveal/ route...")
 			revealBox := packr.New("reveal-assets", "./../../../assets/reveal")
 			http.Handle("/reveal/", http.StripPrefix("/reveal/", http.FileServer(revealBox)))
 
-			//
+			// Static file handler under subroute to serve static files e.g. images
 			log.Info("Setup static file serving under /local/ route...")
 			fs := http.FileServer(http.Dir("."))
 			http.Handle("/local/", http.StripPrefix("/local/", fs))
 
+			// single file handler that only delivers the single Markdown file containing the slides
+			log.Info("Setup markdown handler under /markdown/content.md route...")
+			http.Handle("/markdown/", markdownHandler)
+
+			// entrypoint that delivers the rendered reveal.js index HTML page
 			http.Handle("/", tmplRenderer)
 
+			// start HTTP server
 			hostPort := fmt.Sprintf("%s:%d", host, port)
-
 			log.Infof("Running at addr http://%s/", hostPort)
 			if err := http.ListenAndServe(hostPort, nil); err != nil {
 				log.Error("Error while running serve command: %v", err)

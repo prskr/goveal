@@ -16,12 +16,11 @@
 
 <div class="reveal">
     <div class="slides">
-        <!-- Slides are separated by newline + three dashes + newline, vertical slides identical but two dashes -->
-        <section data-markdown data-separator="^\n{{ .Reveal.HorizontalSeparator }}\n"
-                 data-separator-vertical="^\n{{ .Reveal.VerticalSeparator }}\n">
-            <script type="text/template">
-                {{ .MarkdownBody }}
-            </script>
+        <section data-markdown="/markdown/content.md"
+                 data-separator="^\n{{ .Reveal.HorizontalSeparator }}\n"
+                 data-separator-vertical="^\n{{ .Reveal.VerticalSeparator }}\n"
+                 data-separator-notes="^Note:"
+                 data-charset="iso-8859-15">
         </section>
     </div>
 </div>
@@ -35,6 +34,13 @@
 				progress: true,
 				history: true,
 				center: true,
+                slideNumber: true,
+                hash: true,
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+                markdown:{
+                    smartypants: true,
+                    smartLists: true,
+                },
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
@@ -44,6 +50,7 @@
 					{ src: '/reveal/plugin/notes/notes.js' }
 				]
 			});
+
 
 
 </script>
