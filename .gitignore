@@ -25,5 +25,7 @@ assets/reveal
 
 # binaries
 goveal
-
 !goveal/
+
+# gorelease
+dist/
