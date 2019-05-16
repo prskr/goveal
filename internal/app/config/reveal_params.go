@@ -14,18 +14,26 @@
 
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type RevealParams struct {
 	Theme               string
 	CodeTheme           string
+	Transition          string
+	NavigationMode      string
 	HorizontalSeparator string
 	VerticalSeparator   string
+	StyleSheets         []string
 }
 
 func (params *RevealParams) Load() {
 	params.Theme = viper.GetString("theme")
 	params.CodeTheme = viper.GetString("code-theme")
+	params.Transition = viper.GetString("transition")
+	params.NavigationMode = viper.GetString("navigationMode")
 	params.HorizontalSeparator = viper.GetString("horizontal-separator")
 	params.VerticalSeparator = viper.GetString("vertical-separator")
+	params.StyleSheets = viper.GetStringSlice("stylesheets")
 }

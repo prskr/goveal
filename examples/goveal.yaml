@@ -2,3 +2,5 @@ theme: night
 code-theme: monokai
 horizontal-separator: ===
 vertical-separator: ---
+stylesheets:
+  - examples/custom.css

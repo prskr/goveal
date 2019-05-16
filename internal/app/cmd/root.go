@@ -34,6 +34,8 @@ var (
 	cfgFile             string
 	theme               string
 	codeTheme           string
+	transition          string
+	navigationMode      string
 	horizontalSeparator string
 	verticalSeparator   string
 	rootCmd             = &cobra.Command{
@@ -61,6 +63,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&theme, "theme", defaultTheme, "reveal.js theme to use")
 	rootCmd.PersistentFlags().StringVar(&codeTheme, "code-theme", "monokai", "name of the code theme to use for highlighting")
+	rootCmd.PersistentFlags().StringVar(&transition, "transition", "none", "transition effect to use")
+	rootCmd.PersistentFlags().StringVar(&navigationMode, "navigationMode", "default", "determine the navigation mode to use ['default', 'linear', 'grid']")
 	rootCmd.PersistentFlags().StringVar(&horizontalSeparator, "horizontal-separator", "===", "horizontal separator in slides")
 	rootCmd.PersistentFlags().StringVar(&verticalSeparator, "vertical-separator", "---", "vertical separator in slides")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-reveal-slides.yaml)")

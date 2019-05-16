@@ -28,30 +28,82 @@
 <script src="/reveal/js/reveal.js"></script>
 
 <script>
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: true,
+        hash: true,
+        transition: '{{ .Reveal.Transition }}', // none/fade/slide/convex/concave/zoom
+        navigationMode: '{{ .Reveal.NavigationMode }}',
+        markdown: {
+            smartypants: true,
+            smartLists: true
+        },
+        pdfSeparateFragments: false,
+        menu: {
+            numbers: true,
+            useTextContentForMissingTitles: true,
+            custom: [
+                {
+                    title: 'Print',
+                    icon: '<i class="fas fa-print"></i>',
+                    content: '<a href="/?print-pdf">Go to print view<a/>'
+                }
+            ],
+            themes: [
+                {name: 'Beige', theme: '/reveal/css/theme/beige.css'},
+                {name: 'Black', theme: '/reveal/css/theme/black.css'},
+                {name: 'Blood', theme: '/reveal/css/theme/blood.css'},
+                {name: 'League', theme: '/reveal/css/theme/league.css'},
+                {name: 'Moon', theme: '/reveal/css/theme/moon.css'},
+                {name: 'Night', theme: '/reveal/css/theme/night.css'},
+                {name: 'Serif', theme: '/reveal/css/theme/serif.css'},
+                {name: 'Simple', theme: '/reveal/css/theme/simple.css'},
+                {name: 'Sky', theme: '/reveal/css/theme/sky.css'},
+                {name: 'Solarized', theme: '/reveal/css/theme/solarized.css'},
+                {name: 'White', theme: '/reveal/css/theme/white.css'}
+            ],
+            transitions: true,
+        },
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            {
+                src: '/reveal/plugin/markdown/marked.js', condition: function () {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            },
+            {
+                src: '/reveal/plugin/markdown/markdown.js', condition: function () {
+                    return !!document.querySelector('[data-markdown]');
+                }
+            },
+            {
+                src: '/reveal/plugin/highlight/highlight.js', async: true, callback: function () {
+                    hljs.initHighlightingOnLoad();
+                }
+            },
+            {src: '/reveal/plugin/notes/notes.js'},
+            {src: '/reveal/plugin/menu/menu.js'}
+        ]
+    });
 
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				history: true,
-				center: true,
-                slideNumber: true,
-                hash: true,
-                transition: 'slide', // none/fade/slide/convex/concave/zoom
-                markdown:{
-                    smartypants: true,
-                    smartLists: true,
-                },
+    {{ if (len .Reveal.StyleSheets) gt 0 }}
+    {{ range $idx, $style := .Reveal.StyleSheets }}
+    var additionalStyleSheet = document.createElement('link');
+    additionalStyleSheet.rel = 'stylesheet';
+    additionalStyleSheet.type = 'text/css';
+    additionalStyleSheet.href = '/local/{{- $style }}';
+    document.getElementsByTagName('head')[0].appendChild(additionalStyleSheet);
+    {{ end}}
+    {{ end }}
 
-				// Optional libraries used to extend on reveal.js
-				dependencies: [
-					{ src: '/reveal/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-                    { src: '/reveal/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-                    { src: '/reveal/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: '/reveal/plugin/notes/notes.js' }
-				]
-			});
-
-
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match(/print-pdf/gi) ? '/reveal/css/print/pdf.css' : '/reveal/css/print/paper.css';
+    document.getElementsByTagName('head')[0].appendChild(link);
 
 </script>
 

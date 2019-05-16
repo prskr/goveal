@@ -47,3 +47,14 @@ Content 3.2
 ## External 4.2
 
 <a href="https://www.google.com">Google</a>
+
+===
+
+## Code
+
+```csharp
+var i = 10;
+for (var j = 0; j < i; j++) {
+    Console.WriteLine($"{j}");
+}
+```
