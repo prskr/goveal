@@ -5,7 +5,6 @@ before:
     - ./download_revealjs.sh
     - go mod download
     - go build -v ./...
-    - GO111MODULE=off go get -u github.com/gobuffalo/packr/v2/packr2
     - packr2
 builds:
   - main: ./cmd/goveal/main.go

@@ -11,6 +11,7 @@ jobs:
       - image: circleci/golang:1.12
     steps:
       - checkout
+      - run: GO111MODULE=off go get -u github.com/gobuffalo/packr/v2/packr2
       - run: curl -sL https://git.io/goreleaser | bash
 workflows:
   version: 2
