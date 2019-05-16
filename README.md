@@ -11,16 +11,18 @@ The easiest way to use `goveal` is to download a release, and run it from your `
 goveal serve ./slides.md
 ```
 
-| Param                    | Description                                   | Default value           |
-| ------------------------ | --------------------------------------------- | ----------------------- |
-| `--host`                 | Hostname the binary is listening on           | `localhost`             |
-| `--port`                 | Port the binary is listening on               | `2233`                  |
-| `--code-theme`           | highlight.js theme to use                     | `monokai`               |
-| `--config`               | Path to the config file see [config](#config) | `$HOME/goveal:./goveal` |
-| `-h` / `--help`          | shows help                                    |                         |
-| `--horizontal-separator` | horizontal separator to split slides          | `===`                   |
-| `--vertical-separator`   | vertical separator to split slides            | `---`                   |
-| `--theme`                | reveal.js theme to use                        | `white`                 |
+| Param                    | Description                                                                  | Default value           |
+| ------------------------ | ---------------------------------------------------------------------------- | ----------------------- |
+| `--host`                 | Hostname the binary is listening on                                          | `localhost`             |
+| `--port`                 | Port the binary is listening on                                              | `2233`                  |
+| `--code-theme`           | highlight.js theme to use                                                    | `monokai`               |
+| `--transition`           | Transition effect to show between slides                                     | `none`                  |
+| `--navigationMode`       | Navigation mode to use when using the cursor keys to navigate through slides | `default`               |
+| `--config`               | Path to the config file see [config](#config)                                | `$HOME/goveal:./goveal` |
+| `--horizontal-separator` | horizontal separator to split slides                                         | `===`                   |
+| `--vertical-separator`   | vertical separator to split slides                                           | `---`                   |
+| `--theme`                | reveal.js theme to use                                                       | `white`                 |
+| `-h` / `--help`          | shows help                                                                   |                         |
 
 ## Config
 
@@ -33,3 +35,10 @@ It is more a convenience feature to be able to set a theme and so on and so fort
 Furthermore goveal supports configuration hot reloading i.e. you can play around with different themes and the rendered theme will be changed whenever you hit the save button!
 
 See also an example at [`./examples/goveal.yaml`](./examples/goveal.yaml).
+
+### Custom CSS
+
+To add custom CSS as theme overrides use a config file and add the `stylesheets` property.
+It takes a list of relative (mandatory!) paths to CSS files that are included automatacally after the page was loaded so that they really overload everything added by Reveal and plugins.
+
+the sample configuration file [`./examples/goveal.yaml`](./examples/goveal.yaml) also contains a sample how to add custom CSS.

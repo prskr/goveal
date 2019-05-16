@@ -16,9 +16,10 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/baez90/go-reveal-slides/internal/app/config"
 	"github.com/fsnotify/fsnotify"
-	"os"
 
 	"github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
