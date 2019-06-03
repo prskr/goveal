@@ -19,13 +19,15 @@ import (
 )
 
 type RevealParams struct {
-	Theme               string
-	CodeTheme           string
-	Transition          string
-	NavigationMode      string
-	HorizontalSeparator string
-	VerticalSeparator   string
-	StyleSheets         []string
+	Theme                 string
+	CodeTheme             string
+	Transition            string
+	NavigationMode        string
+	HorizontalSeparator   string
+	VerticalSeparator     string
+	SlideNumberVisibility string
+	SlideNumberFormat     string
+	StyleSheets           []string
 }
 
 func (params *RevealParams) Load() {
@@ -36,4 +38,6 @@ func (params *RevealParams) Load() {
 	params.HorizontalSeparator = viper.GetString("horizontal-separator")
 	params.VerticalSeparator = viper.GetString("vertical-separator")
 	params.StyleSheets = viper.GetStringSlice("stylesheets")
+	params.SlideNumberVisibility = viper.GetString("slide-number-visibility")
+	params.SlideNumberFormat = viper.GetString("slide-number-format")
 }

@@ -32,14 +32,17 @@ const (
 )
 
 var (
-	cfgFile             string
-	theme               string
-	codeTheme           string
-	transition          string
-	navigationMode      string
-	horizontalSeparator string
-	verticalSeparator   string
-	rootCmd             = &cobra.Command{
+	cfgFile               string
+	theme                 string
+	codeTheme             string
+	transition            string
+	navigationMode        string
+	horizontalSeparator   string
+	verticalSeparator     string
+	showSlideNumbers      bool
+	slideNumberVisibility string
+	slideNumberFormat     string
+	rootCmd               = &cobra.Command{
 		Use:   "goveal",
 		Short: "goveal is a small reveal.js server",
 		Long: `goveal is a single static binary to host your reveal.js based markdown presentation.
@@ -69,7 +72,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&horizontalSeparator, "horizontal-separator", "===", "horizontal separator in slides")
 	rootCmd.PersistentFlags().StringVar(&verticalSeparator, "vertical-separator", "---", "vertical separator in slides")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-reveal-slides.yaml)")
-
+	rootCmd.PersistentFlags().StringVar(&slideNumberVisibility, "slide-number-visibility", "all", "where should slide numbers be visible ['all', 'speaker', 'print']")
+	rootCmd.PersistentFlags().StringVar(&slideNumberFormat, "slide-number-format", "h.v", "Format of the slide number ['h.v', 'h/v', 'c', 'c/t']")
 }
 
 func initLogging() {
