@@ -14,7 +14,10 @@
 
 package main
 
-import "github.com/baez90/go-reveal-slides/internal/app/cmd"
+import (
+	_ "github.com/baez90/go-reveal-slides"
+	"github.com/baez90/go-reveal-slides/internal/app/cmd"
+)
 
 func main() {
 	cmd.Execute()

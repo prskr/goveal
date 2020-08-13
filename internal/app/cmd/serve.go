@@ -17,7 +17,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/baez90/go-reveal-slides/internal/app/rendering"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"
@@ -50,8 +50,7 @@ var (
 
 			// Packr2 handler to serve Reveal.js assets
 			log.Info("Setup reveal assets under route /reveal/ route...")
-			revealBox := packr.New("reveal-assets", "./../../../assets/reveal")
-			http.Handle("/reveal/", http.StripPrefix("/reveal/", http.FileServer(revealBox)))
+			http.Handle("/reveal/", http.StripPrefix("/reveal/", http.FileServer(pkger.Dir("/assets/reveal"))))
 
 			// Static file handler under subroute to serve static files e.g. images
 			log.Info("Setup static file serving under /local/ route...")

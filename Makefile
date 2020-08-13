@@ -9,10 +9,10 @@ BINARY_NAME = goveal
 DIR = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 DEBUG_PORT = 2345
 
-REVEALJS_VERSION = 3.8.0
-GORELEASER_VERSION = 0.106.0
+REVEALJS_VERSION = 4.0.2
+GORELEASER_VERSION = 0.132.1
 
-.PHONY: all clean clean-all clean-vendor rebuild format revive test deps compile run debug watch watch-test cloc docs serve-docs serve-godoc ensure-revive ensure-reflex ensure-delve ensure-godoc ensure-packr2 ensure-goreleaser
+.PHONY: all clean clean-all clean-vendor rebuild format revive test deps compile run debug watch watch-test cloc docs serve-docs serve-godoc ensure-revive ensure-reflex ensure-delve ensure-godoc ensure-pkger ensure-goreleaser
 
 export CGO_ENABLED:=0
 
@@ -28,10 +28,10 @@ format:
 revive: ensure-revive
 	@revive --config $(DIR)assets/lint/config.toml -exclude $(DIR)vendor/... -formatter friendly $(DIR)...
 
-clean: ensure-packr2
+clean: ensure-pkger
 	@rm -f debug $(BINARY_NAME)
 	@rm -rf dist
-	@packr2 clean
+	@pkger clean
 
 clean-vendor:
 	rm -rf vendor/
@@ -49,8 +49,9 @@ html-cover-report:
 deps:
 	@go build -v ./...
 
-compile: deps ensure-packr2
-	@$(GOARGS) packr2 build $(GO_BUILD_ARGS) -o $(DIR)/$(BINARY_NAME) $(BUILD_PATH)
+compile: deps ensure-pkger
+	@pkger
+	@$(GOARGS) go build $(GO_BUILD_ARGS) -o $(DIR)/$(BINARY_NAME) $(BUILD_PATH)
 
 run:
 	@go run $(BUILD_PATH)
@@ -65,7 +66,10 @@ debug: ensure-delve
 
 download-reveal:
 	@mkdir -p $(DIR)/assets/reveal
-	@curl -sL https://github.com/hakimel/reveal.js/archive/$(REVEALJS_VERSION).tar.gz | tar -xvz --strip-components=1 -C $(DIR)/assets/reveal --wildcards "*.js" --wildcards "*.css" --exclude "test" --exclude "gruntfile.js"
+	@curl -sL https://github.com/hakimel/reveal.js/archive/$(REVEALJS_VERSION).tar.gz | tar -xvz --strip-components=1 -C $(DIR)/assets/reveal --wildcards "*.js" --wildcards "*.css" --wildcards "*.html" --wildcards "*.woff" --wildcards "*.ttf" --exclude "test" --exclude "gruntfile.js" --exclude "examples/*.html"
+	@mkdir -p $(DIR)/assets/reveal/plugin/menu $(DIR)/assets/reveal/plugin/mouse-pointer
+	@git clone https://github.com/denehyg/reveal.js-menu.git $(DIR)/assets/reveal/plugin/menu
+	@curl -L -o $(DIR)/assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
 
 watch: ensure-reflex
 	@reflex -r '\.go$$' -s -- sh -c 'make debug'
@@ -108,9 +112,9 @@ ifeq (, $(shell which godoc))
 	$(shell go get -u golang.org/x/tools/cmd/godoc)
 endif
 
-ensure-packr2:
-ifeq (, $(shell which packr2))
-	$(shell go get -u github.com/gobuffalo/packr/v2/packr2)
+ensure-pkger:
+ifeq (, $(shell which pkger))
+	$(shell go get -u github.com/markbates/pkger/cmd/pkger)
 endif
 
 ensure-goreleaser:

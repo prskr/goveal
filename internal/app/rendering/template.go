@@ -16,9 +16,10 @@ package rendering
 
 import (
 	"github.com/baez90/go-reveal-slides/internal/app/config"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/markbates/pkger"
 	log "github.com/sirupsen/logrus"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -43,13 +44,17 @@ type revealRenderer struct {
 }
 
 func (renderer *revealRenderer) init() (err error) {
-	templateBox := packr.New("rendering", "./../../../assets/template")
-	templateString, err := templateBox.FindString("reveal-markdown.tmpl")
+	templateFile, err :=pkger.Open("/assets/template/reveal-markdown.tmpl")
 	if err != nil {
 		return
 	}
 
-	renderer.template, err = template.New("index").Parse(templateString)
+	templateString, err := ioutil.ReadAll(templateFile)
+	if err != nil {
+		return
+	}
+
+	renderer.template, err = template.New("index").Parse(string(templateString))
 	return
 }
 

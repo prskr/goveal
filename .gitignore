@@ -20,8 +20,7 @@
 
 assets/reveal
 
-# packr2 generated
-*-packr.go
+pkged.go
 
 # binaries
 goveal

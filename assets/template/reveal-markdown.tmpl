@@ -6,10 +6,11 @@
 
     <title>goveal</title>
 
-    <link rel="stylesheet" href="/reveal/css/reveal.css">
-    <link rel="stylesheet" href="/reveal/css/theme/{{ .Reveal.Theme }}.css" id="theme">
+    <link rel="stylesheet" href="/reveal/dist/reveal.css">
+    <link rel="stylesheet" href="/reveal/dist/reset.css">
+    <link rel="stylesheet" href="/reveal/dist/theme/{{ .Reveal.Theme }}.css" id="theme">
 
-    <link rel="stylesheet" href="/reveal/lib/css/{{ .Reveal.CodeTheme }}.css">
+    <link rel="stylesheet" href="/reveal/plugin/highlight/{{ .Reveal.CodeTheme }}.css">
 </head>
 
 <body>
@@ -25,7 +26,11 @@
     </div>
 </div>
 
-<script src="/reveal/js/reveal.js"></script>
+<script src="/reveal/dist/reveal.js"></script>
+<script src="/reveal/plugin/markdown/markdown.js"></script>
+<script src="/reveal/plugin/highlight/highlight.js"></script>
+<script src="/reveal/plugin/notes/notes.js"></script>
+<script src="/reveal/plugin/menu/menu.js"></script>
 
 <script>
     Reveal.initialize({
@@ -55,43 +60,24 @@
                 }
             ],
             themes: [
-                {name: 'Beige', theme: '/reveal/css/theme/beige.css'},
-                {name: 'Black', theme: '/reveal/css/theme/black.css'},
-                {name: 'Blood', theme: '/reveal/css/theme/blood.css'},
-                {name: 'League', theme: '/reveal/css/theme/league.css'},
-                {name: 'Moon', theme: '/reveal/css/theme/moon.css'},
-                {name: 'Night', theme: '/reveal/css/theme/night.css'},
-                {name: 'Serif', theme: '/reveal/css/theme/serif.css'},
-                {name: 'Simple', theme: '/reveal/css/theme/simple.css'},
-                {name: 'Sky', theme: '/reveal/css/theme/sky.css'},
-                {name: 'Solarized', theme: '/reveal/css/theme/solarized.css'},
-                {name: 'White', theme: '/reveal/css/theme/white.css'}
+                {name: 'Beige', theme: '/reveal/dist/theme/beige.css'},
+                {name: 'Black', theme: '/reveal/dist/theme/black.css'},
+                {name: 'Blood', theme: '/reveal/dist/theme/blood.css'},
+                {name: 'League', theme: '/reveal/dist/theme/league.css'},
+                {name: 'Moon', theme: '/reveal/dist/theme/moon.css'},
+                {name: 'Night', theme: '/reveal/dist/theme/night.css'},
+                {name: 'Serif', theme: '/reveal/dist/theme/serif.css'},
+                {name: 'Simple', theme: '/reveal/dist/theme/simple.css'},
+                {name: 'Sky', theme: '/reveal/dist/theme/sky.css'},
+                {name: 'Solarized', theme: '/reveal/dist/theme/solarized.css'},
+                {name: 'White', theme: '/reveal/dist/theme/white.css'}
             ],
             transitions: true,
         },
-        // Optional libraries used to extend on reveal.js
-        dependencies: [
-            {
-                src: '/reveal/plugin/markdown/marked.js', condition: function () {
-                    return !!document.querySelector('[data-markdown]');
-                }
-            },
-            {
-                src: '/reveal/plugin/markdown/markdown.js', condition: function () {
-                    return !!document.querySelector('[data-markdown]');
-                }
-            },
-            {
-                src: '/reveal/plugin/highlight/highlight.js', async: true, callback: function () {
-                    hljs.initHighlightingOnLoad();
-                }
-            },
-            {src: '/reveal/plugin/notes/notes.js'},
-            {src: '/reveal/plugin/menu/menu.js'}
-        ]
+        plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu ]
     });
 
-    {{ if (len .Reveal.StyleSheets) gt 0 }}
+    {{ if .Reveal.StyleSheets }}
     {{ range $idx, $style := .Reveal.StyleSheets }}
     var additionalStyleSheet = document.createElement('link');
     additionalStyleSheet.rel = 'stylesheet';
@@ -100,12 +86,6 @@
     document.getElementsByTagName('head')[0].appendChild(additionalStyleSheet);
     {{ end}}
     {{ end }}
-
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.href = window.location.search.match(/print-pdf/gi) ? '/reveal/css/print/pdf.css' : '/reveal/css/print/paper.css';
-    document.getElementsByTagName('head')[0].appendChild(link);
 
 </script>
 
