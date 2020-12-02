@@ -40,7 +40,7 @@ Content 3.2
 
 ## External 4.1
 
-![Local image](/local/examples/gopher.jpg)
+![Local image](/examples/gopher.jpg)
 
 ---
 

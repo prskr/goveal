@@ -28,3 +28,6 @@ goveal
 
 # gorelease
 dist/
+
+#Taskfile
+.task/

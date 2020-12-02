@@ -2,16 +2,18 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.15
     steps:
       - checkout
-      - run: make compile
+      - run: sh -c "$(curl -ssL https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+      - run: task cli-cover-report
   release:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.15
     steps:
       - checkout
-      - run: GO111MODULE=off go get -u github.com/gobuffalo/packr/v2/packr2
+      - run: sh -c "$(curl -ssL https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+      - run: task tools download-reveal
       - run: curl -sL https://git.io/goreleaser | bash
 workflows:
   version: 2

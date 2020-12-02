@@ -6,18 +6,18 @@
 
     <title>goveal</title>
 
-    <link rel="stylesheet" href="/reveal/dist/reveal.css">
-    <link rel="stylesheet" href="/reveal/dist/reset.css">
-    <link rel="stylesheet" href="/reveal/dist/theme/{{ .Reveal.Theme }}.css" id="theme">
+    <link rel="stylesheet" href="/dist/reveal.css">
+    <link rel="stylesheet" href="/dist/reset.css">
+    <link rel="stylesheet" href="/dist/theme/{{ .Reveal.Theme }}.css" id="theme">
 
-    <link rel="stylesheet" href="/reveal/plugin/highlight/{{ .Reveal.CodeTheme }}.css">
+    <link rel="stylesheet" href="/plugin/highlight/{{ .Reveal.CodeTheme }}.css">
 </head>
 
 <body>
 
 <div class="reveal">
     <div class="slides">
-        <section data-markdown="/markdown/content.md"
+        <section data-markdown="/content.md"
                  data-separator="^\n{{ .Reveal.HorizontalSeparator }}\n"
                  data-separator-vertical="^\n{{ .Reveal.VerticalSeparator }}\n"
                  data-separator-notes="^Note:"
@@ -26,11 +26,11 @@
     </div>
 </div>
 
-<script src="/reveal/dist/reveal.js"></script>
-<script src="/reveal/plugin/markdown/markdown.js"></script>
-<script src="/reveal/plugin/highlight/highlight.js"></script>
-<script src="/reveal/plugin/notes/notes.js"></script>
-<script src="/reveal/plugin/menu/menu.js"></script>
+<script src="/dist/reveal.js"></script>
+<script src="/plugin/markdown/markdown.js"></script>
+<script src="/plugin/highlight/highlight.js"></script>
+<script src="/plugin/notes/notes.js"></script>
+<script src="/plugin/menu/menu.js"></script>
 
 <script>
     Reveal.initialize({
@@ -60,17 +60,17 @@
                 }
             ],
             themes: [
-                {name: 'Beige', theme: '/reveal/dist/theme/beige.css'},
-                {name: 'Black', theme: '/reveal/dist/theme/black.css'},
-                {name: 'Blood', theme: '/reveal/dist/theme/blood.css'},
-                {name: 'League', theme: '/reveal/dist/theme/league.css'},
-                {name: 'Moon', theme: '/reveal/dist/theme/moon.css'},
-                {name: 'Night', theme: '/reveal/dist/theme/night.css'},
-                {name: 'Serif', theme: '/reveal/dist/theme/serif.css'},
-                {name: 'Simple', theme: '/reveal/dist/theme/simple.css'},
-                {name: 'Sky', theme: '/reveal/dist/theme/sky.css'},
-                {name: 'Solarized', theme: '/reveal/dist/theme/solarized.css'},
-                {name: 'White', theme: '/reveal/dist/theme/white.css'}
+                {name: 'Beige', theme: '/dist/theme/beige.css'},
+                {name: 'Black', theme: '/dist/theme/black.css'},
+                {name: 'Blood', theme: '/dist/theme/blood.css'},
+                {name: 'League', theme: '/dist/theme/league.css'},
+                {name: 'Moon', theme: '/dist/theme/moon.css'},
+                {name: 'Night', theme: '/dist/theme/night.css'},
+                {name: 'Serif', theme: '/dist/theme/serif.css'},
+                {name: 'Simple', theme: '/dist/theme/simple.css'},
+                {name: 'Sky', theme: '/dist/theme/sky.css'},
+                {name: 'Solarized', theme: '/dist/theme/solarized.css'},
+                {name: 'White', theme: '/dist/theme/white.css'}
             ],
             transitions: true,
         },
@@ -82,7 +82,7 @@
     var additionalStyleSheet = document.createElement('link');
     additionalStyleSheet.rel = 'stylesheet';
     additionalStyleSheet.type = 'text/css';
-    additionalStyleSheet.href = '/local/{{- $style }}';
+    additionalStyleSheet.href = '/{{- $style }}';
     document.getElementsByTagName('head')[0].appendChild(additionalStyleSheet);
     {{ end}}
     {{ end }}

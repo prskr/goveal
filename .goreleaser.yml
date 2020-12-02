@@ -1,11 +1,7 @@
 project_name: goveal
 before:
   hooks:
-    - mkdir -p ./assets/reveal
-    - ./download_revealjs.sh
-    - go mod download
-    - go build -v ./...
-    - packr2
+    - task test
 builds:
   - main: ./cmd/goveal/main.go
     binary: goveal

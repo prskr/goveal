@@ -15,12 +15,14 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/baez90/go-reveal-slides/internal/app/rendering"
+	"github.com/baez90/go-reveal-slides/internal/app/routing"
 	"github.com/markbates/pkger"
 	"github.com/spf13/cobra"
-	"net/http"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -33,43 +35,47 @@ var (
 		Args:  cobra.ExactArgs(1),
 		Short: "",
 		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
-			tmplRenderer, err := rendering.NewRevealRenderer(&params)
-
-			if err != nil {
+			router := &routing.RegexpRouter{}
+			var tmplRenderer rendering.RevealRenderer
+			if tmplRenderer, err = rendering.NewRevealRenderer(&params); err != nil {
 				log.Errorf("Failed to initialize reveal renderer due to error: %v", err)
-				os.Exit(1)
+				return
 			}
 
-			markdownHandler, err := rendering.NewMarkdownHandler(args[0])
-			if err != nil {
-				log.Errorf("Failed to initialize reveal renderer due to error: %v", err)
-				os.Exit(1)
+			log.Info("Setup template renderer")
+			if err = router.AddRule(`^(/(index.html(l)?)?)?$`, tmplRenderer); err != nil {
+				return
 			}
 
-			// Packr2 handler to serve Reveal.js assets
-			log.Info("Setup reveal assets under route /reveal/ route...")
-			http.Handle("/reveal/", http.StripPrefix("/reveal/", http.FileServer(pkger.Dir("/assets/reveal"))))
-
-			// Static file handler under subroute to serve static files e.g. images
-			log.Info("Setup static file serving under /local/ route...")
-			fs := http.FileServer(http.Dir("."))
-			http.Handle("/local/", http.StripPrefix("/local/", fs))
+			var markdownHandler rendering.MarkdownHandler
+			if markdownHandler, err = rendering.NewMarkdownHandler(args[0]); err != nil {
+				log.Errorf("Failed to initialize reveal renderer due to error: %v", err)
+				return
+			}
 
 			// single file handler that only delivers the single Markdown file containing the slides
-			log.Info("Setup markdown handler under /markdown/content.md route...")
-			http.Handle("/markdown/", markdownHandler)
+			log.Info("Setup markdown handler for any *.md file...")
+			if err = router.AddRule(".*\\.md$", markdownHandler); err != nil {
+				return
+			}
 
-			// entrypoint that delivers the rendered reveal.js index HTML page
-			http.Handle("/", tmplRenderer)
+			layeredHandler := &routing.LayeredHandler{}
+			layeredHandler.AddHandlers(pkger.Dir("/assets/reveal"), http.Dir("."))
+
+			log.Info("Setup local file system and Reveal assets under / route")
+			if err = router.AddRule("/.+", layeredHandler); err != nil {
+				return
+			}
 
 			// start HTTP server
 			hostPort := fmt.Sprintf("%s:%d", host, port)
 			log.Infof("Running at addr http://%s/", hostPort)
-			if err := http.ListenAndServe(hostPort, nil); err != nil {
-				log.Error("Error while running serve command: %v", err)
+			if err = http.ListenAndServe(hostPort, router); err != nil && errors.Is(err, http.ErrServerClosed) {
+				log.Errorf("Error while running serve command: %v", err)
 			}
+			return nil
 		},
 	}
 )

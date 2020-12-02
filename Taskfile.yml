@@ -1,0 +1,85 @@
+version: '3'
+
+vars:
+  DEBUG_PORT: 2345
+  REVEALJS_VERSION: 4.1.0
+  BINARY_NAME: goveal
+  OUT_DIR: ./out
+  GO_BUILD_ARGS: -ldflags="-w -s"
+  CMD_PACKAGE: github.com/baez90/go-reveal-slides/cmd/goveal
+
+emv:
+  CGO_ENABLED: 0
+
+tasks:
+  clean:
+    cmds:
+      - rm -f debug {{ .BINARY_NAME }}
+      - rm -rf ./dist {{ .OUT_DIR }}
+      - pkger clean
+
+  format:
+    cmds:
+      - go fmt ./...
+
+  deps:
+    sources:
+      - go.mod
+      - go.sum
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  test:
+    sources:
+      - ./**/*.go
+    deps:
+      - deps
+    cmds:
+      - go test -coverprofile={{ .OUT_DIR }}/cov-raw.out -v ./...
+      - cat {{ .OUT_DIR }}/cov-raw.out | grep -v "generated" > {{ .OUT_DIR }}/cov.out
+
+  cli-cover-report:
+    cmds:
+      - go tool cover -func={{ .OUT_DIR }}/cov.out
+
+  html-cover-report:
+    cmds:
+      - go tool cover -html={{ .OUT_DIR }}/cov.out -o {{ .OUT_DIR }}/coverage.html
+
+  build:
+    deps:
+      - deps
+    sources:
+      - ./**/*.go
+    cmds:
+      - pkger
+      - go build {{ .GO_BUILD_ARGS }} -o  {{ .BINARY_NAME }} {{ .CMD_PACKAGE }}
+
+  run:
+    deps:
+      - deps
+    cmds:
+      - go run {{ .CMD_PACKAGE }} serve ./examples/slides.md
+
+  debug:
+    cmds:
+      - dlv debug --headless --listen=127.10.10.2:{{ .DEBUG_PORT }} --api-version=2 {{ .CMD_PACKAGE }} --build-flags="-tags debug" -- serve --config ./examples/goveal.yaml ./examples/slides.md
+
+  snapshot-release:
+    cmds:
+      - goreleaser --snapshot --skip-publish --rm-dist
+
+  tools:
+    cmds:
+      - go get -u github.com/markbates/pkger/cmd/pkger
+
+  download-reveal:
+    cmds:
+      - rm -rf ./assets/reveal
+      - mkdir -p ./assets/reveal
+      - curl -sL https://github.com/hakimel/reveal.js/archive/{{ .REVEALJS_VERSION }}.tar.gz | tar -xvz --strip-components=1 -C ./assets/reveal --wildcards "*.js" --wildcards "*.css" --wildcards "*.html" --wildcards "*.woff" --wildcards "*.ttf" --exclude "test" --exclude "gruntfile.js" --exclude "examples/*.html"
+      - mkdir -p ./assets/reveal/plugin/menu ./assets/reveal/plugin/mouse-pointer
+      - git clone https://github.com/denehyg/reveal.js-menu.git ./assets/reveal/plugin/menu
+      - curl -L -o ./assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
+      - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}

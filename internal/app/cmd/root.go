@@ -39,7 +39,6 @@ var (
 	navigationMode        string
 	horizontalSeparator   string
 	verticalSeparator     string
-	showSlideNumbers      bool
 	slideNumberVisibility string
 	slideNumberFormat     string
 	rootCmd               = &cobra.Command{
