@@ -36,14 +36,19 @@ tasks:
     deps:
       - deps
     cmds:
+      - mkdir -p {{ .OUT_DIR }}
       - go test -coverprofile={{ .OUT_DIR }}/cov-raw.out -v ./...
       - cat {{ .OUT_DIR }}/cov-raw.out | grep -v "generated" > {{ .OUT_DIR }}/cov.out
 
   cli-cover-report:
+    deps:
+      - test
     cmds:
       - go tool cover -func={{ .OUT_DIR }}/cov.out
 
   html-cover-report:
+    deps:
+      - test
     cmds:
       - go tool cover -html={{ .OUT_DIR }}/cov.out -o {{ .OUT_DIR }}/coverage.html
 

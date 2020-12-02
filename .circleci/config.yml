@@ -5,16 +5,17 @@ jobs:
       - image: circleci/golang:1.15
     steps:
       - checkout
-      - run: sh -c "$(curl -ssL https://taskfile.dev/install.sh)" -- -d -b /usr/bin
-      - run: task cli-cover-report
+      - run: sh -c "$(curl -ssL https://taskfile.dev/install.sh)" -- -d
+      - run: ./bin/task cli-cover-report
   release:
     docker:
       - image: circleci/golang:1.15
     steps:
       - checkout
-      - run: sh -c "$(curl -ssL https://taskfile.dev/install.sh)" -- -d -b /usr/bin
-      - run: task tools download-reveal
+      - run: sh -c "$(curl -ssL https://taskfile.dev/install.sh)" -- -d
+      - run: ./bin/task tools download-reveal
       - run: curl -sL https://git.io/goreleaser | bash
+      - run: goreleaser release
 workflows:
   version: 2
   build_and_release:
