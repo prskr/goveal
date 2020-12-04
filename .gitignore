@@ -18,6 +18,9 @@
 .vscode/
 .history
 
+# CI
+bin/
+
 assets/reveal
 
 pkged.go

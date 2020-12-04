@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/baez90/go-reveal-slides/internal/app/config"
+	"github.com/baez90/go-reveal-slides/internal/app/rendering"
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/mitchellh/go-homedir"
@@ -48,7 +48,7 @@ var (
 It is running a small web server that loads your markdown file, renders a complete HTML page and delivers it including all the reveal.js assets.
 It is not required to restart the server when you edit the markdown - a simple reload of the page is doing all the required magic.`,
 	}
-	params config.RevealParams
+	params rendering.RevealParams
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.

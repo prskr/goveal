@@ -15,12 +15,13 @@
 package rendering
 
 import (
-	"github.com/baez90/go-reveal-slides/internal/app/config"
-	"github.com/markbates/pkger"
-	log "github.com/sirupsen/logrus"
 	"html/template"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/Masterminds/sprig"
+	"github.com/markbates/pkger"
+	log "github.com/sirupsen/logrus"
 )
 
 type RevealRenderer interface {
@@ -28,7 +29,7 @@ type RevealRenderer interface {
 	init() error
 }
 
-func NewRevealRenderer(params *config.RevealParams) (renderer RevealRenderer, err error) {
+func NewRevealRenderer(params *RevealParams) (renderer RevealRenderer, err error) {
 	renderer = &revealRenderer{
 		params: params,
 	}
@@ -40,11 +41,11 @@ func NewRevealRenderer(params *config.RevealParams) (renderer RevealRenderer, er
 type revealRenderer struct {
 	template         *template.Template
 	renderedTemplate string
-	params           *config.RevealParams
+	params           *RevealParams
 }
 
 func (renderer *revealRenderer) init() (err error) {
-	templateFile, err :=pkger.Open("/assets/template/reveal-markdown.tmpl")
+	templateFile, err := pkger.Open("/assets/template/reveal-markdown.tmpl")
 	if err != nil {
 		return
 	}
@@ -54,11 +55,11 @@ func (renderer *revealRenderer) init() (err error) {
 		return
 	}
 
-	renderer.template, err = template.New("index").Parse(string(templateString))
+	renderer.template, err = template.New("index").Funcs(sprig.FuncMap()).Parse(string(templateString))
 	return
 }
 
-func (renderer *revealRenderer) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (renderer *revealRenderer) ServeHTTP(response http.ResponseWriter, _ *http.Request) {
 
 	if renderer.template == nil {
 		writeErrorResponse(500, "rendering is not set - probably error during startup", response)
@@ -66,7 +67,7 @@ func (renderer *revealRenderer) ServeHTTP(response http.ResponseWriter, request 
 	}
 
 	err := renderer.template.Execute(response, struct {
-		Reveal config.RevealParams
+		Reveal RevealParams
 	}{Reveal: *renderer.params})
 
 	if err != nil {

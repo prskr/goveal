@@ -30,6 +30,12 @@ tasks:
       - go mod download
       - go mod tidy
 
+  assets:
+    sources:
+      - ./assets/**/*
+    cmds:
+      - pkger
+
   test:
     sources:
       - ./**/*.go
@@ -55,23 +61,26 @@ tasks:
   build:
     deps:
       - deps
+      - assets
     sources:
       - ./**/*.go
     cmds:
-      - pkger
       - go build {{ .GO_BUILD_ARGS }} -o  {{ .BINARY_NAME }} {{ .CMD_PACKAGE }}
 
   run:
     deps:
       - deps
+      - assets
     cmds:
-      - go run {{ .CMD_PACKAGE }} serve ./examples/slides.md
+      - go run {{ .CMD_PACKAGE }} serve ./examples/slides.md --config ./examples/goveal.yaml
 
   debug:
     cmds:
       - dlv debug --headless --listen=127.10.10.2:{{ .DEBUG_PORT }} --api-version=2 {{ .CMD_PACKAGE }} --build-flags="-tags debug" -- serve --config ./examples/goveal.yaml ./examples/slides.md
 
   snapshot-release:
+    deps:
+      - assets
     cmds:
       - goreleaser --snapshot --skip-publish --rm-dist
 
@@ -83,8 +92,9 @@ tasks:
     cmds:
       - rm -rf ./assets/reveal
       - mkdir -p ./assets/reveal
-      - curl -sL https://github.com/hakimel/reveal.js/archive/{{ .REVEALJS_VERSION }}.tar.gz | tar -xvz --strip-components=1 -C ./assets/reveal --wildcards "*.js" --wildcards "*.css" --wildcards "*.html" --wildcards "*.woff" --wildcards "*.ttf" --exclude "test" --exclude "gruntfile.js" --exclude "examples/*.html"
+      - curl -sL https://github.com/hakimel/reveal.js/archive/{{ .REVEALJS_VERSION }}.tar.gz | tar -xvz --strip-components=1 -C ./assets/reveal --wildcards "*.js" --wildcards "*.css" --wildcards "*.html" --wildcards "*.woff" --wildcards "*.ttf" --exclude "test" --exclude "gulpfile.js" --exclude "gruntfile.js"  --exclude "demo.html" --exclude "index.html" --exclude "examples/*.html"
       - mkdir -p ./assets/reveal/plugin/menu ./assets/reveal/plugin/mouse-pointer
       - git clone https://github.com/denehyg/reveal.js-menu.git ./assets/reveal/plugin/menu
       - curl -L -o ./assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
       - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}
+      - curl -L https://github.com/highlightjs/highlight.js/archive/10.4.0.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-10.4.0/src/styles/

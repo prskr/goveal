@@ -1,7 +1,4 @@
 project_name: goveal
-before:
-  hooks:
-    - task test
 builds:
   - main: ./cmd/goveal/main.go
     binary: goveal
