@@ -25,6 +25,8 @@ jobs:
       
       - name: Install Task
         uses: Arduino/actions/setup-taskfile@master
+        with:
+            version: '3.x'
       
       - name: Build & test
         run: task download-reveal assets test
