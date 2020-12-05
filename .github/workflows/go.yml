@@ -1,0 +1,38 @@
+name: Go
+
+on: [ push, pull_request ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.15
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.15'
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      
+      - name: Install pkger
+        run: go get -u github.com/markbates/pkger/cmd/pkger
+      
+      - name: Install Task
+        uses: Arduino/actions/setup-taskfile@master
+      
+      - name: Build & test
+        run: task download-reveal assets test
+      
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
