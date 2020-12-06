@@ -2,6 +2,7 @@ package routing
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -23,8 +24,21 @@ var etagHeaders = []string{
 	"If-Unmodified-Since",
 }
 
-func NoCache(h http.Handler) http.Handler {
+func NoCache(h http.Handler, pathsToDisableCache []string) http.Handler {
+
+	pathLookup := make(map[string]bool)
+
+	for idx := range pathsToDisableCache {
+		pathLookup[strings.ToLower(pathsToDisableCache[idx])] = true
+	}
+
 	fn := func(w http.ResponseWriter, r *http.Request) {
+
+		if _, shouldBeHandled := pathLookup[strings.ToLower(r.URL.Path)]; !shouldBeHandled {
+			h.ServeHTTP(w, r)
+			return
+		}
+
 		// Delete any ETag headers that may have been set
 		for _, v := range etagHeaders {
 			if r.Header.Get(v) != "" {

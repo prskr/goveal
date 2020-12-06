@@ -1,6 +1,6 @@
 # Goveal
 
-[![CircleCI](https://circleci.com/gh/baez90/go-reveal-slides.svg?style=svg)](https://circleci.com/gh/baez90/go-reveal-slides)
+[![Actions Status](https://github.com/baez90/goveal/workflows/Go/badge.svg)](https://github.com/baez90/goveal/actions)
 
 Goveal is very small an very simple tool that reads Markdown from a given file, renders  it into a HTML template and serves it as local HTTP server.
 Right now Goveal uses Reveal.js 4.0.2 to create presentations and therefore also includes all features of Reveal.js 4.0.2.

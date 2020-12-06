@@ -6,7 +6,7 @@ vars:
   BINARY_NAME: goveal
   OUT_DIR: ./out
   GO_BUILD_ARGS: -ldflags="-w -s"
-  CMD_PACKAGE: github.com/baez90/go-reveal-slides/cmd/goveal
+  CMD_PACKAGE: github.com/baez90/goveal/cmd/goveal
 
 emv:
   CGO_ENABLED: 0

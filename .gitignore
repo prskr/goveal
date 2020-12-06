@@ -21,13 +21,9 @@
 # CI
 bin/
 
-assets/reveal
+assets/reveal/
 
 pkged.go
-
-# binaries
-goveal
-!goveal/
 
 # gorelease
 dist/

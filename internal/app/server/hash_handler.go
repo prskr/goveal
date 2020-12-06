@@ -79,6 +79,7 @@ func (h hashHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 		Hash:     encodedHash,
 	}
 
+	writer.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(writer)
 	if err = encoder.Encode(resp); err != nil {
 		writer.WriteHeader(500)

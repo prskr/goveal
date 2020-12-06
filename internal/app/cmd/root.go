@@ -17,8 +17,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
-	"github.com/baez90/go-reveal-slides/internal/app/rendering"
+	"github.com/baez90/goveal/internal/app/rendering"
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/mitchellh/go-homedir"
@@ -27,21 +28,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	defaultTheme string = "white"
-)
-
 var (
-	cfgFile               string
-	theme                 string
-	codeTheme             string
-	transition            string
-	navigationMode        string
-	horizontalSeparator   string
-	verticalSeparator     string
-	slideNumberVisibility string
-	slideNumberFormat     string
-	rootCmd               = &cobra.Command{
+	cfgFile    string
+	workingDir string
+	rootCmd    = &cobra.Command{
 		Use:   "goveal",
 		Short: "goveal is a small reveal.js server",
 		Long: `goveal is a single static binary to host your reveal.js based markdown presentation.
@@ -61,18 +51,18 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
 	cobra.OnInitialize(initLogging)
+	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&theme, "theme", defaultTheme, "reveal.js theme to use")
-	rootCmd.PersistentFlags().StringVar(&codeTheme, "code-theme", "monokai", "name of the code theme to use for highlighting")
-	rootCmd.PersistentFlags().StringVar(&transition, "transition", "none", "transition effect to use")
-	rootCmd.PersistentFlags().StringVar(&navigationMode, "navigationMode", "default", "determine the navigation mode to use ['default', 'linear', 'grid']")
-	rootCmd.PersistentFlags().StringVar(&horizontalSeparator, "horizontal-separator", "===", "horizontal separator in slides")
-	rootCmd.PersistentFlags().StringVar(&verticalSeparator, "vertical-separator", "---", "vertical separator in slides")
+	var err error
+	workingDir, err = os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-reveal-slides.yaml)")
-	rootCmd.PersistentFlags().StringVar(&slideNumberVisibility, "slide-number-visibility", "all", "where should slide numbers be visible ['all', 'speaker', 'print']")
-	rootCmd.PersistentFlags().StringVar(&slideNumberFormat, "slide-number-format", "h.v", "Format of the slide number ['h.v', 'h/v', 'c', 'c/t']")
+	rootCmd.PersistentFlags().StringVar(&workingDir, "working-dir", workingDir, "working directory to use")
 }
 
 func initLogging() {
@@ -83,6 +73,24 @@ func initLogging() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	var err error
+	if workingDir, err = filepath.Abs(workingDir); err != nil {
+		log.Warnf("Failed to determine absolute path for working dir %s: %v", workingDir, err)
+		return
+	}
+
+	var cwd string
+	if cwd, err = os.Getwd(); err != nil {
+		log.Warnf("Failed to determine current working directory")
+		return
+	}
+
+	if cwd != workingDir {
+		if err = os.Chdir(workingDir); err != nil {
+			log.Warnf("Failed to change working directory to %s", workingDir)
+		}
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -95,14 +103,9 @@ func initConfig() {
 			viper.AddConfigPath(home)
 		}
 
-		cwd, err := os.Getwd()
-		if err != nil {
-			log.Infof("Failed to determine current working directory: %v", err)
-		} else {
-			viper.AddConfigPath(cwd)
-		}
-
+		viper.AddConfigPath(workingDir)
 		viper.SetConfigName("goveal")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -119,10 +122,6 @@ func initConfig() {
 		})
 	}
 
-	if err := viper.BindPFlags(rootCmd.PersistentFlags()); err != nil {
-		log.Errorf("Failed to bind flags to viper")
-	}
-
+	params.WorkingDirectory = workingDir
 	params.Load()
-
 }

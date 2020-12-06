@@ -1,4 +1,4 @@
-module github.com/baez90/go-reveal-slides
+module github.com/baez90/goveal
 
 go 1.15
 
@@ -11,7 +11,7 @@ require (
 	github.com/gobuffalo/here v0.6.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
-	github.com/imdario/mergo v0.3.11 // indirect
+	github.com/imdario/mergo v0.3.11
 	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0

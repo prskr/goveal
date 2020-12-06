@@ -16,25 +16,45 @@ package rendering
 
 import (
 	"github.com/bmatcuk/doublestar/v2"
+	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
+	"path"
+	"path/filepath"
+)
+
+var (
+	defaultParams = RevealParams{
+		Theme:                 "white",
+		CodeTheme:             "vs",
+		Transition:            "None",
+		NavigationMode:        "default",
+		HorizontalSeparator:   "===",
+		VerticalSeparator:     "---",
+		SlideNumberVisibility: "all",
+		SlideNumberFormat:     "h.v",
+		StyleSheets:           make([]string, 0),
+		FilesToMonitor:        make([]string, 0),
+	}
 )
 
 type RevealParams struct {
 	Theme                 string   `mapstructure:"theme"`
-	CodeTheme             string   `mapstructure:"code-theme"`
+	CodeTheme             string   `mapstructure:"codeTheme"`
 	Transition            string   `mapstructure:"transition"`
 	NavigationMode        string   `mapstructure:"navigationMode"`
-	HorizontalSeparator   string   `mapstructure:"horizontal-separator"`
-	VerticalSeparator     string   `mapstructure:"vertical-separator"`
-	SlideNumberVisibility string   `mapstructure:"slide-number-visibility"`
-	SlideNumberFormat     string   `mapstructure:"slide-number-format"`
+	HorizontalSeparator   string   `mapstructure:"horizontalSeparator"`
+	VerticalSeparator     string   `mapstructure:"verticalSeparator"`
+	SlideNumberVisibility string   `mapstructure:"slideNumberVisibility"`
+	SlideNumberFormat     string   `mapstructure:"slideNumberFormat"`
 	StyleSheets           []string `mapstructure:"stylesheets"`
 	FilesToMonitor        []string `mapstructure:"filesToMonitor"`
+	WorkingDirectory      string   `mapstructure:"working-dir"`
 }
 
-func (params *RevealParams) Load() {
+func (params *RevealParams) Load() error {
 	_ = viper.Unmarshal(params)
 	expandGlobs(params)
+	return mergo.Merge(params, &defaultParams)
 }
 
 func expandGlobs(params *RevealParams) {
@@ -43,10 +63,24 @@ func expandGlobs(params *RevealParams) {
 	for _, f := range params.FilesToMonitor {
 		var err error
 
+		f, err = filepath.Abs(f)
+		if err != nil {
+			continue
+		}
+
 		var matches []string
 		if matches, err = doublestar.Glob(f); err != nil {
 			continue
 		}
+
+		for idx := range matches {
+			if relative, err := filepath.Rel(params.WorkingDirectory, matches[idx]); err != nil {
+				continue
+			} else {
+				matches[idx] = path.Join("/", relative)
+			}
+		}
+
 		allFiles = append(allFiles, matches...)
 	}
 	params.FilesToMonitor = allFiles

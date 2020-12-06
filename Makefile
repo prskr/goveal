@@ -1,5 +1,5 @@
 VERSION = $(shell git describe --dirty --tags --always)
-REPO = github.com/baez90/go-reveal-slides
+REPO = github.com/baez90/goveal
 BUILD_PATH = $(REPO)/cmd/goveal
 PKGS = $(shell go list ./... | grep -v /vendor/)
 TEST_PKGS = $(shell find . -type f -name "*_test.go" -printf '%h\n' | sort -u)

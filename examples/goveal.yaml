@@ -1,9 +1,9 @@
 theme: night
-code-theme: monokai
-horizontal-separator: ===
-vertical-separator: ---
+codeTheme: monokai
+horizontalSeparator: ===
+verticalSeparator: ---
 transition: fade
 stylesheets:
-  - examples/custom.css
+  - custom.css
 filesToMonitor:
-  - examples/**/*.css
+  - ./**/*.css

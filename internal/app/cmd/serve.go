@@ -21,7 +21,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/baez90/go-reveal-slides/internal/app/server"
+	"github.com/baez90/goveal/internal/app/server"
 	"github.com/spf13/cobra"
 
 	log "github.com/sirupsen/logrus"

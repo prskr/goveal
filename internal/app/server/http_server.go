@@ -5,9 +5,13 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/baez90/go-reveal-slides/internal/app/rendering"
-	"github.com/baez90/go-reveal-slides/internal/app/routing"
+	"github.com/baez90/goveal/internal/app/rendering"
+	"github.com/baez90/goveal/internal/app/routing"
 	"github.com/markbates/pkger"
+)
+
+const (
+	markdownFilePath = "/content.md"
 )
 
 type Config struct {
@@ -31,6 +35,9 @@ func (srv HTTPServer) ListenAddress() string {
 }
 
 func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
+
+	noCacheFiles := append(config.RevealParams.FilesToMonitor, markdownFilePath)
+
 	router := &routing.RegexpRouter{}
 	var tmplRenderer rendering.RevealRenderer
 	if tmplRenderer, err = rendering.NewRevealRenderer(config.RevealParams); err != nil {
@@ -50,20 +57,20 @@ func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
 	fs := routing.NewLayeredFileSystem(pkger.Dir("/assets/reveal"), pkger.Dir("/assets/web"), http.Dir("."), mdFS)
 
 	//language=regexp
-	if err = router.AddRule(`^(?i)/hash/(md5|sha1|sha2)/.*`, routing.NoCache(NewHashHandler(fs))); err != nil {
+	if err = router.AddRule(`^(?i)/hash/(md5|sha1|sha2)/.*`, NewHashHandler(fs)); err != nil {
 		return
 	}
-	if err = router.AddRule("^/.*\\.md$", routing.NoCache(http.FileServer(mdFS))); err != nil {
+	if err = router.AddRule("^/.*\\.md$", http.FileServer(mdFS)); err != nil {
 		return
 	}
-	if err = router.AddRule("/.+", routing.NoCache(http.FileServer(fs))); err != nil {
+	if err = router.AddRule("/.+", http.FileServer(fs)); err != nil {
 		return
 	}
 
 	hostPort := fmt.Sprintf("%s:%d", config.Host, config.Port)
 
 	srv = &HTTPServer{
-		handler: router,
+		handler: routing.NoCache(router, noCacheFiles),
 	}
 
 	if srv.listener, err = net.Listen("tcp", hostPort); err != nil {

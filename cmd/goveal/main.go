@@ -15,8 +15,8 @@
 package main
 
 import (
-	_ "github.com/baez90/go-reveal-slides"
-	"github.com/baez90/go-reveal-slides/internal/app/cmd"
+	_ "github.com/baez90/goveal"
+	"github.com/baez90/goveal/internal/app/cmd"
 )
 
 func main() {
