@@ -10,17 +10,18 @@ includes all features of Reveal.js 4.1.2.
 
 The easiest and fastest way to install Goveal is to use a pre-built binary from the [releases](https://github.com/baez90/goveal/releases/latest).
 
-If you have Go in the latest version installed you can also install it like so:
+If you have Go in the latest version installed you can also build your own version of Goveal:
 
-```bash
-// latest and greatest
-go install github.com/baez90/goveal@latest
-
-// release
-go install github.com/baez90/goveal@v0.0.7
+```shell
+task build
 ```
 
-_Note: Releases before v0.0.7 are based on Go 1.15 and used Pkger to embed Reveal.JS and cannot be installed with `go install`._ 
+Requirements:
+
+- [task](https://taskfile.dev/)
+- _Optional:_ [goreleaser](https://goreleaser.com/) (for `task snapshot-release` to build all binaries)
+
+_Note: All script tasks in the [Taskfile.yml](Taskfile.yml) are meant to be executed with Linux/MacOS. Binaries for Windows are provided but not tested!_ 
 
 ## Usage
 
