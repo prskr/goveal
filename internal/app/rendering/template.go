@@ -18,7 +18,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/Masterminds/sprig"
+	"github.com/Masterminds/sprig/v3"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/baez90/goveal/assets"
