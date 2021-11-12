@@ -3,6 +3,7 @@ version: '3'
 vars:
   DEBUG_PORT: 2345
   REVEALJS_VERSION: 4.1.2
+  HIGHLIGHTJS_VERSION: 11.3.1
   BINARY_NAME: goveal
   OUT_DIR: ./out
   GO_BUILD_ARGS: -ldflags="-w -s"
@@ -43,6 +44,7 @@ tasks:
       - ./**/*.go
     deps:
       - deps
+      - fmt
     cmds:
       - mkdir -p {{ .OUT_DIR }}
       - go test -coverprofile={{ .OUT_DIR }}/cov-raw.out -v ./...
@@ -84,6 +86,8 @@ tasks:
       - goreleaser --snapshot --skip-publish --rm-dist
 
   download-reveal:
+    sources:
+      - Taskfile.yml
     cmds:
       - rm -rf ./assets/reveal
       - mkdir -p ./assets/reveal
@@ -92,7 +96,7 @@ tasks:
       - git clone https://github.com/denehyg/reveal.js-menu.git ./assets/reveal/plugin/menu
       - curl -L -o ./assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
       - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}
-      - curl -L https://github.com/highlightjs/highlight.js/archive/10.4.0.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-10.4.0/src/styles/
+      - curl -L https://github.com/highlightjs/highlight.js/archive/{{ .HIGHLIGHTJS_VERSION }}.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-{{ .HIGHLIGHTJS_VERSION }}/src/styles/
 
   go-get-tool:
     vars:
@@ -105,7 +109,7 @@ tasks:
     cmds:
       - task: go-get-tool
         vars:
-          PACKAGE: mvdan.cc/gofumpt@v0.1.1
+          PACKAGE: mvdan.cc/gofumpt@v0.2.0
     status:
       - test -f {{ .GOBIN }}gofumpt
 

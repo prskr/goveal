@@ -20,16 +20,11 @@ jobs:
         with:
           lfs: true
       
-      - name: Install pkger
-        run: go get -u github.com/markbates/pkger/cmd/pkger
-      
       - name: Install Task
-        uses: Arduino/actions/setup-taskfile@master
-        with:
-            version: '3.x'
+        uses: arduino/setup-task@v1
       
       - name: Build & test
-        run: task download-reveal assets test
+        run: task download-reveal test
       
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
