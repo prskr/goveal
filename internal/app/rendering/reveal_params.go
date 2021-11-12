@@ -15,27 +15,26 @@
 package rendering
 
 import (
+	"path"
+	"path/filepath"
+
 	"github.com/bmatcuk/doublestar/v2"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
-	"path"
-	"path/filepath"
 )
 
-var (
-	defaultParams = RevealParams{
-		Theme:                 "white",
-		CodeTheme:             "vs",
-		Transition:            "None",
-		NavigationMode:        "default",
-		HorizontalSeparator:   "===",
-		VerticalSeparator:     "---",
-		SlideNumberVisibility: "all",
-		SlideNumberFormat:     "h.v",
-		StyleSheets:           make([]string, 0),
-		FilesToMonitor:        make([]string, 0),
-	}
-)
+var defaultParams = RevealParams{
+	Theme:                 "white",
+	CodeTheme:             "vs",
+	Transition:            "None",
+	NavigationMode:        "default",
+	HorizontalSeparator:   "===",
+	VerticalSeparator:     "---",
+	SlideNumberVisibility: "all",
+	SlideNumberFormat:     "h.v",
+	StyleSheets:           make([]string, 0),
+	FilesToMonitor:        make([]string, 0),
+}
 
 type RevealParams struct {
 	Theme                 string   `mapstructure:"theme"`

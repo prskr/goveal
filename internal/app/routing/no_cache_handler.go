@@ -25,7 +25,6 @@ var etagHeaders = []string{
 }
 
 func NoCache(h http.Handler, pathsToDisableCache []string) http.Handler {
-
 	pathLookup := make(map[string]bool)
 
 	for idx := range pathsToDisableCache {
@@ -33,7 +32,6 @@ func NoCache(h http.Handler, pathsToDisableCache []string) http.Handler {
 	}
 
 	fn := func(w http.ResponseWriter, r *http.Request) {
-
 		if _, shouldBeHandled := pathLookup[strings.ToLower(r.URL.Path)]; !shouldBeHandled {
 			h.ServeHTTP(w, r)
 			return

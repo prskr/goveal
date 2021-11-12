@@ -16,12 +16,12 @@ package rendering
 
 import (
 	"html/template"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/Masterminds/sprig"
-	"github.com/markbates/pkger"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/baez90/goveal/assets"
 )
 
 type RevealRenderer interface {
@@ -39,28 +39,16 @@ func NewRevealRenderer(params *RevealParams) (renderer RevealRenderer, err error
 }
 
 type revealRenderer struct {
-	template         *template.Template
-	renderedTemplate string
-	params           *RevealParams
+	template *template.Template
+	params   *RevealParams
 }
 
 func (renderer *revealRenderer) init() (err error) {
-	templateFile, err := pkger.Open("/assets/template/reveal-markdown.tmpl")
-	if err != nil {
-		return
-	}
-
-	templateString, err := ioutil.ReadAll(templateFile)
-	if err != nil {
-		return
-	}
-
-	renderer.template, err = template.New("index").Funcs(sprig.FuncMap()).Parse(string(templateString))
+	renderer.template, err = template.New("index").Funcs(sprig.FuncMap()).Parse(string(assets.Template))
 	return
 }
 
 func (renderer *revealRenderer) ServeHTTP(response http.ResponseWriter, _ *http.Request) {
-
 	if renderer.template == nil {
 		writeErrorResponse(500, "rendering is not set - probably error during startup", response)
 		return
@@ -69,7 +57,6 @@ func (renderer *revealRenderer) ServeHTTP(response http.ResponseWriter, _ *http.
 	err := renderer.template.Execute(response, struct {
 		Reveal RevealParams
 	}{Reveal: *renderer.params})
-
 	if err != nil {
 		writeErrorResponse(500, "Failed to render Markdown to rendering", response)
 		log.Errorf("Failed to render Markdown rendering: %v", err)

@@ -2,12 +2,13 @@ package server
 
 import (
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 
+	"github.com/baez90/goveal/assets"
 	"github.com/baez90/goveal/internal/app/rendering"
 	"github.com/baez90/goveal/internal/app/routing"
-	"github.com/markbates/pkger"
 )
 
 const (
@@ -35,7 +36,6 @@ func (srv HTTPServer) ListenAddress() string {
 }
 
 func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
-
 	noCacheFiles := append(config.RevealParams.FilesToMonitor, markdownFilePath)
 
 	router := &routing.RegexpRouter{}
@@ -45,7 +45,8 @@ func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
 		return
 	}
 
-	if err = router.AddRule(`^(\/(index.html(l)?)?)?$`, tmplRenderer); err != nil {
+	// language=regexp
+	if err = router.AddRule(`^(/(index.html(l)?)?)?$`, tmplRenderer); err != nil {
 		return
 	}
 
@@ -54,16 +55,28 @@ func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
 		err = fmt.Errorf("failed to initialize markdown file handler %w", err)
 		return
 	}
-	fs := routing.NewLayeredFileSystem(pkger.Dir("/assets/reveal"), pkger.Dir("/assets/web"), http.Dir("."), mdFS)
 
-	//language=regexp
-	if err = router.AddRule(`^(?i)/hash/(md5|sha1|sha2)/.*`, NewHashHandler(fs)); err != nil {
+	var revealFS, webFS fs.FS
+	if revealFS, err = fs.Sub(assets.Assets, "reveal"); err != nil {
+		return nil, err
+	}
+
+	if webFS, err = fs.Sub(assets.Assets, "web"); err != nil {
+		return nil, err
+	}
+
+	layeredFS := routing.NewLayeredFileSystem(http.FS(revealFS), http.FS(webFS), http.Dir("."), mdFS)
+
+	// language=regexp
+	if err = router.AddRule(`^(?i)/hash/(md5|sha1|sha2)/.*`, NewHashHandler(layeredFS)); err != nil {
 		return
 	}
+	// language=regexp
 	if err = router.AddRule("^/.*\\.md$", http.FileServer(mdFS)); err != nil {
 		return
 	}
-	if err = router.AddRule("/.+", http.FileServer(fs)); err != nil {
+	// language=regexp
+	if err = router.AddRule("/.+", http.FileServer(layeredFS)); err != nil {
 		return
 	}
 

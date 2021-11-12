@@ -21,8 +21,9 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/baez90/goveal/internal/app/server"
 	"github.com/spf13/cobra"
+
+	"github.com/baez90/goveal/internal/app/server"
 
 	log "github.com/sirupsen/logrus"
 )

@@ -2,25 +2,33 @@ version: '3'
 
 vars:
   DEBUG_PORT: 2345
-  REVEALJS_VERSION: 4.1.0
+  REVEALJS_VERSION: 4.1.2
   BINARY_NAME: goveal
   OUT_DIR: ./out
   GO_BUILD_ARGS: -ldflags="-w -s"
   CMD_PACKAGE: github.com/baez90/goveal/cmd/goveal
 
-emv:
+env:
   CGO_ENABLED: 0
+  GOBIN:
+    sh: echo "$(pwd)/bin/"
 
 tasks:
   clean:
     cmds:
       - rm -f debug {{ .BINARY_NAME }}
       - rm -rf ./dist {{ .OUT_DIR }}
-      - pkger clean
 
-  format:
+  fmt:
+    desc: Run gofumpt against code
+    deps:
+      - gofumpt
+      - goimports
+    sources:
+      - "**/*.go"
     cmds:
-      - go fmt ./...
+      - "{{ .GOBIN }}gofumpt -l -w ./"
+      - "{{ .GOBIN }}goimports -w -local github.com/baez90/goveal ./."
 
   deps:
     sources:
@@ -29,12 +37,6 @@ tasks:
     cmds:
       - go mod download
       - go mod tidy
-
-  assets:
-    sources:
-      - ./assets/**/*
-    cmds:
-      - pkger
 
   test:
     sources:
@@ -61,7 +63,6 @@ tasks:
   build:
     deps:
       - deps
-      - assets
     sources:
       - ./**/*.go
     cmds:
@@ -70,23 +71,17 @@ tasks:
   run:
     deps:
       - deps
-      - assets
+    dir: ./examples
     cmds:
-      - go run {{ .CMD_PACKAGE }} serve ./examples/slides.md --config ./examples/goveal.yaml
+      - go run {{ .CMD_PACKAGE }} serve ./slides.md --config ./goveal.yaml
 
   debug:
     cmds:
       - dlv debug --headless --listen=127.10.10.2:{{ .DEBUG_PORT }} --api-version=2 {{ .CMD_PACKAGE }} --build-flags="-tags debug" -- serve --config ./examples/goveal.yaml ./examples/slides.md
 
   snapshot-release:
-    deps:
-      - assets
     cmds:
       - goreleaser --snapshot --skip-publish --rm-dist
-
-  tools:
-    cmds:
-      - go get -u github.com/markbates/pkger/cmd/pkger
 
   download-reveal:
     cmds:
@@ -98,3 +93,27 @@ tasks:
       - curl -L -o ./assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
       - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}
       - curl -L https://github.com/highlightjs/highlight.js/archive/10.4.0.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-10.4.0/src/styles/
+
+  go-get-tool:
+    vars:
+      PACKAGE: '{{ default "" .PACKAGE }}'
+    cmds:
+      - go install {{ .PACKAGE }}
+
+  gofumpt:
+    desc: Download gofumpt locally if necessary
+    cmds:
+      - task: go-get-tool
+        vars:
+          PACKAGE: mvdan.cc/gofumpt@v0.1.1
+    status:
+      - test -f {{ .GOBIN }}gofumpt
+
+  goimports:
+    desc: Download goimports locally if necessary
+    cmds:
+      - task: go-get-tool
+        vars:
+          PACKAGE: golang.org/x/tools/cmd/goimports@v0.1.7
+    status:
+      - test -f {{ .GOBIN }}goimports

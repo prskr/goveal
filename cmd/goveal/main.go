@@ -15,7 +15,6 @@
 package main
 
 import (
-	_ "github.com/baez90/goveal"
 	"github.com/baez90/goveal/internal/app/cmd"
 )
 

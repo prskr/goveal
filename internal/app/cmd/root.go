@@ -19,8 +19,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/baez90/goveal/internal/app/rendering"
 	"github.com/fsnotify/fsnotify"
+
+	"github.com/baez90/goveal/internal/app/rendering"
 
 	"github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
@@ -118,10 +119,14 @@ func initConfig() {
 		viper.WatchConfig()
 		viper.OnConfigChange(func(in fsnotify.Event) {
 			log.Info("Noticed configuration change...")
-			params.Load()
+			if err := params.Load(); err != nil {
+				log.Warnf("Failed to load config: %v", err)
+			}
 		})
 	}
 
 	params.WorkingDirectory = workingDir
-	params.Load()
+	if err := params.Load(); err != nil {
+		log.Warnf("Failed to load config: %v", err)
+	}
 }

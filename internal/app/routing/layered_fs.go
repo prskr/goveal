@@ -6,9 +6,7 @@ import (
 	"sync"
 )
 
-var (
-	ErrFileNotFound = errors.New("file not found in any layer")
-)
+var ErrFileNotFound = errors.New("file not found in any layer")
 
 func NewLayeredFileSystem(layers ...http.FileSystem) http.FileSystem {
 	return &layeredFileSystem{
