@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/bmatcuk/doublestar/v2 v2.0.4
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/imdario/mergo v0.3.12
