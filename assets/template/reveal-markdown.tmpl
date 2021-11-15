@@ -18,8 +18,8 @@
 <div class="reveal">
     <div class="slides">
         <section data-markdown="/content.md"
-                 data-separator="^\n{{ .Reveal.HorizontalSeparator }}\n"
-                 data-separator-vertical="^\n{{ .Reveal.VerticalSeparator }}\n"
+                 data-separator="^{{ .Reveal.LineEnding -}}{{ .Reveal.HorizontalSeparator }}{{- .Reveal.LineEnding }}"
+                 data-separator-vertical="^{{ .Reveal.LineEnding -}}{{ .Reveal.VerticalSeparator }}{{- .Reveal.LineEnding }}"
                  data-separator-notes="^Note:"
                  data-charset="iso-8859-15">
         </section>
@@ -42,8 +42,8 @@
         slideNumber: true,
         hash: true,
         transition: '{{ .Reveal.Transition }}', // none/fade/slide/convex/concave/zoom
-        navigationMode: '{{ .Reveal.NavigationMode }}',
-        showSlideNumber: '{{ .Reveal.SlideNumberVisibility }}',
+        navigationMode: {{ .Reveal.NavigationMode | trim | quote }},
+        showSlideNumber: {{ .Reveal.SlideNumberVisibility | trim | quote }},
         slideNumber: '{{ .Reveal.SlideNumberFormat }}',
         markdown: {
             smartypants: true,

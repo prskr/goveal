@@ -32,6 +32,7 @@ var defaultParams = RevealParams{
 	VerticalSeparator:     "---",
 	SlideNumberVisibility: "all",
 	SlideNumberFormat:     "h.v",
+	LineEnding:            LineEnding,
 	StyleSheets:           make([]string, 0),
 	FilesToMonitor:        make([]string, 0),
 }
@@ -48,6 +49,7 @@ type RevealParams struct {
 	StyleSheets           []string `mapstructure:"stylesheets"`
 	FilesToMonitor        []string `mapstructure:"filesToMonitor"`
 	WorkingDirectory      string   `mapstructure:"working-dir"`
+	LineEnding            string   `mapstructure:"-"`
 }
 
 func (params *RevealParams) Load() error {
