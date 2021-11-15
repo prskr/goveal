@@ -21,6 +21,8 @@ import (
 	"github.com/bmatcuk/doublestar/v2"
 	"github.com/imdario/mergo"
 	"github.com/spf13/viper"
+
+	"github.com/baez90/goveal/internal/encoding"
 )
 
 var defaultParams = RevealParams{
@@ -32,24 +34,23 @@ var defaultParams = RevealParams{
 	VerticalSeparator:     "---",
 	SlideNumberVisibility: "all",
 	SlideNumberFormat:     "h.v",
-	LineEnding:            LineEnding,
 	StyleSheets:           make([]string, 0),
 	FilesToMonitor:        make([]string, 0),
 }
 
 type RevealParams struct {
-	Theme                 string   `mapstructure:"theme"`
-	CodeTheme             string   `mapstructure:"codeTheme"`
-	Transition            string   `mapstructure:"transition"`
-	NavigationMode        string   `mapstructure:"navigationMode"`
-	HorizontalSeparator   string   `mapstructure:"horizontalSeparator"`
-	VerticalSeparator     string   `mapstructure:"verticalSeparator"`
-	SlideNumberVisibility string   `mapstructure:"slideNumberVisibility"`
-	SlideNumberFormat     string   `mapstructure:"slideNumberFormat"`
-	StyleSheets           []string `mapstructure:"stylesheets"`
-	FilesToMonitor        []string `mapstructure:"filesToMonitor"`
-	WorkingDirectory      string   `mapstructure:"working-dir"`
-	LineEnding            string   `mapstructure:"-"`
+	Theme                 string              `mapstructure:"theme"`
+	CodeTheme             string              `mapstructure:"codeTheme"`
+	Transition            string              `mapstructure:"transition"`
+	NavigationMode        string              `mapstructure:"navigationMode"`
+	HorizontalSeparator   string              `mapstructure:"horizontalSeparator"`
+	VerticalSeparator     string              `mapstructure:"verticalSeparator"`
+	SlideNumberVisibility string              `mapstructure:"slideNumberVisibility"`
+	SlideNumberFormat     string              `mapstructure:"slideNumberFormat"`
+	StyleSheets           []string            `mapstructure:"stylesheets"`
+	FilesToMonitor        []string            `mapstructure:"filesToMonitor"`
+	WorkingDirectory      string              `mapstructure:"working-dir"`
+	LineEnding            encoding.LineEnding `mapstructure:"-"`
 }
 
 func (params *RevealParams) Load() error {

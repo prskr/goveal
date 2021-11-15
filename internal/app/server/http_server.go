@@ -5,27 +5,31 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/baez90/goveal/assets"
 	"github.com/baez90/goveal/internal/app/rendering"
 	"github.com/baez90/goveal/internal/app/routing"
+	"github.com/baez90/goveal/internal/encoding"
 )
 
 const (
 	markdownFilePath = "/content.md"
 )
 
-type Config struct {
-	Host         string
-	Port         uint16
-	MarkdownPath string
-	RevealParams *rendering.RevealParams
-}
+type (
+	Config struct {
+		Host         string
+		Port         uint16
+		MarkdownPath string
+		RevealParams *rendering.RevealParams
+	}
 
-type HTTPServer struct {
-	listener net.Listener
-	handler  http.Handler
-}
+	HTTPServer struct {
+		listener net.Listener
+		handler  http.Handler
+	}
+)
 
 func (srv HTTPServer) Serve() error {
 	return http.Serve(srv.listener, srv.handler)
@@ -37,6 +41,9 @@ func (srv HTTPServer) ListenAddress() string {
 
 func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
 	noCacheFiles := append(config.RevealParams.FilesToMonitor, markdownFilePath)
+	if err := detectMarkdownFileEnding(config.MarkdownPath, config.RevealParams); err != nil {
+		return nil, err
+	}
 
 	router := &routing.RegexpRouter{}
 	var tmplRenderer rendering.RevealRenderer
@@ -91,4 +98,21 @@ func NewHTTPServer(config Config) (srv *HTTPServer, err error) {
 	}
 
 	return
+}
+
+func detectMarkdownFileEnding(filePath string, params *rendering.RevealParams) error {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = f.Close()
+	}()
+
+	if le, err := encoding.Detect(f); err != nil {
+		return err
+	} else {
+		params.LineEnding = le
+	}
+	return nil
 }
