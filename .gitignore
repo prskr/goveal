@@ -22,6 +22,7 @@
 bin/
 
 assets/reveal/
+assets/mermaid/
 
 pkged.go
 

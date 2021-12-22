@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>goveal</title>
+
+    <link rel="stylesheet" href="/reveal/dist/reveal.css">
+    <link rel="stylesheet" href="/reveal/dist/reset.css">
+    <link rel="stylesheet" href="/reveal/dist/theme/{{ .Reveal.Theme }}.css" id="theme">
+
+    <link rel="stylesheet" href="/reveal/plugin/highlight/{{ .Reveal.CodeTheme }}.css">
+
+    {{ range .Rendering.Stylesheets}}
+        <link id="{{ fileId . }}" rel="stylesheet" href="/{{ . }}">
+    {{ end }}
+</head>
+
+<body>
+
+<div class="reveal">
+    <div id="content-root" class="slides">
+    </div>
+</div>
+
+<script src="/reveal/dist/reveal.js"></script>
+<script src="/reveal/plugin/highlight/highlight.js"></script>
+<script src="/reveal/plugin/notes/notes.js"></script>
+<script src="/reveal/plugin/menu/menu.js"></script>
+<script src="/mermaid/mermaid.min.js"></script>
+<script src="/js/app.js"></script>
+
+
+</body>
+</html>

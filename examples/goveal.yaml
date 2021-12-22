@@ -2,8 +2,7 @@ theme: night
 codeTheme: monokai
 horizontalSeparator: ===
 verticalSeparator: ---
-transition: fade
+transition: convex
+menu.numbers: false
 stylesheets:
   - custom.css
-filesToMonitor:
-  - ./**/*.css

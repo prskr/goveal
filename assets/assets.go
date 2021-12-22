@@ -3,8 +3,6 @@ package assets
 import "embed"
 
 var (
-	//go:embed template/reveal-markdown.tmpl
-	Template []byte
-	//go:embed web reveal
+	//go:embed reveal mermaid/mermaid.min.js
 	Assets embed.FS
 )
