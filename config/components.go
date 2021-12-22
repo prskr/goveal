@@ -4,6 +4,8 @@ var defaults = map[string]interface{}{
 	"mermaid.theme":                       "forest",
 	"theme":                               "beige",
 	"codeTheme":                           "monokai",
+	"verticalSeparator":                   `\*\*\*`,
+	"horizontalSeparator":                 `---`,
 	"transition":                          TransitionNone,
 	"controlsLayout":                      ControlsLayoutEdges,
 	"controls":                            true,

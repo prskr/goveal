@@ -2,9 +2,9 @@ version: '3'
 
 vars:
   DEBUG_PORT: 2345
-  REVEALJS_VERSION: 4.1.2
+  REVEALJS_VERSION: 4.2.1
   HIGHLIGHTJS_VERSION: 11.3.1
-  MERMAID_VERSION: 8.13.4
+  MERMAID_VERSION: 8.13.6
   BINARY_NAME: goveal
   OUT_DIR: ./out
   GO_BUILD_ARGS: -ldflags="-w -s"
@@ -98,7 +98,7 @@ tasks:
       - curl -L -o ./assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
       - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}
       - curl -L https://github.com/highlightjs/highlight.js/archive/{{ .HIGHLIGHTJS_VERSION }}.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-{{ .HIGHLIGHTJS_VERSION }}/src/styles/
-      - curl -L https://github.com/mermaid-js/mermaid/archive/refs/tags/{{ .MERMAID_VERSION }}.tar.gz | tar -xvz -C ./assets/mermaid/ mermaid-{{ .MERMAID_VERSION }}/dist --strip-components=2
+      - curl -L https://registry.npmjs.org/mermaid/-/mermaid-{{ .MERMAID_VERSION }}.tgz | tar -xvz -C ./assets/mermaid/ package/dist --strip-components=2
 
   go-get-tool:
     vars:

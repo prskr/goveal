@@ -91,7 +91,7 @@ for (var j = 0; j < i; j++) {
 ### Mermaid
 
 ```mermaid
-%%{init: {'theme': 'dark'}}%%
+%%{init: {'theme': 'neutral'}}%%
 flowchart LR
    a --> b & c--> d
 ```
@@ -101,7 +101,6 @@ flowchart LR
 ### The inadequacy of a non-highlighted being
 
 {line-numbers="1-2|3|4"}
-
 ```js
 let a = 1;
 let b = 2;

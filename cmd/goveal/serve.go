@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/hex"
+	"fmt"
 	"hash/fnv"
 	"net/http"
+	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -20,10 +23,18 @@ import (
 	"github.com/baez90/goveal/web"
 )
 
+const (
+	defaultListeningPort uint16 = 3000
+	defaultHost                 = "127.0.0.1"
+)
+
 var (
-	workingDir string
-	cfg        *config.Components
-	serveCmd   = &cobra.Command{
+	workingDir  string
+	cfg         *config.Components
+	host        string
+	port        uint16
+	openBrowser bool
+	serveCmd    = &cobra.Command{
 		Use:  "serve",
 		Args: cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) (err error) {
@@ -47,6 +58,10 @@ var (
 						h := fnv.New32a()
 						return hex.EncodeToString(h.Sum([]byte(path.Base(fileName))))
 					}),
+				AppName:               "goveal",
+				GETOnly:               true,
+				DisableStartupMessage: true,
+				StreamRequestBody:     true,
 			})
 			hub := events.NewEventHub(
 				wdfs,
@@ -63,11 +78,38 @@ var (
 				return err
 			}
 
-			return app.Listen(":3000")
+			if openBrowser {
+				log.Info("Opening browser...")
+				openBrowserInBackground(fmt.Sprintf("http://%s:%d", host, port))
+			}
+
+			log.Infof("Listening on %s:%d", host, port)
+			return app.Listen(fmt.Sprintf("%s:%d", host, port))
 		},
 	}
 )
 
 func init() {
+	serveCmd.Flags().Uint16Var(&port, "port", defaultListeningPort, "port to listen on")
+	serveCmd.Flags().StringVar(&host, "host", defaultHost, "address/hostname to bind on")
+	serveCmd.Flags().BoolVar(&openBrowser, "open-browser", true, "Open browser when starting")
 	rootCmd.AddCommand(serveCmd)
+}
+
+func openBrowserInBackground(url string) {
+	var err error
+
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	if err != nil {
+		log.Warn(err)
+	}
 }
