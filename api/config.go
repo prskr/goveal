@@ -11,9 +11,9 @@ type ConfigAPI struct {
 }
 
 func RegisterConfigAPI(app *fiber.App, cfg *config.Components) {
-	cfgApi := &ConfigAPI{cfg: cfg}
-	app.Get("/api/v1/config/reveal", cfgApi.RevealConfig)
-	app.Get("/api/v1/config/mermaid", cfgApi.MermaidConfig)
+	cfgAPI := &ConfigAPI{cfg: cfg}
+	app.Get("/api/v1/config/reveal", cfgAPI.RevealConfig)
+	app.Get("/api/v1/config/mermaid", cfgAPI.MermaidConfig)
 }
 
 func (a *ConfigAPI) RevealConfig(ctx *fiber.Ctx) error {

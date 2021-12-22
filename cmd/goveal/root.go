@@ -23,6 +23,7 @@ import (
 	"github.com/baez90/goveal/config"
 )
 
+//nolint:lll // explanations are rather long
 var (
 	cfgFile string
 	rootCmd = &cobra.Command{

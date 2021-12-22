@@ -1,21 +1,19 @@
 package config
 
-var (
-	defaults = map[string]interface{}{
-		"mermaid.theme":                       "forest",
-		"theme":                               "beige",
-		"codeTheme":                           "monokai",
-		"transition":                          TransitionNone,
-		"controlsLayout":                      ControlsLayoutEdges,
-		"controls":                            true,
-		"progress":                            true,
-		"history":                             true,
-		"center":                              true,
-		"slideNumber":                         true,
-		"menu.numbers":                        true,
-		"menu.useTextContentForMissingTitles": true,
-	}
-)
+var defaults = map[string]interface{}{
+	"mermaid.theme":                       "forest",
+	"theme":                               "beige",
+	"codeTheme":                           "monokai",
+	"transition":                          TransitionNone,
+	"controlsLayout":                      ControlsLayoutEdges,
+	"controls":                            true,
+	"progress":                            true,
+	"history":                             true,
+	"center":                              true,
+	"slideNumber":                         true,
+	"menu.numbers":                        true,
+	"menu.useTextContentForMissingTitles": true,
+}
 
 const (
 	TransitionNone    Transition = "none"
@@ -65,10 +63,5 @@ type (
 )
 
 func (t Transition) String() string {
-	switch t {
-	case TransitionNone:
-		return "none"
-	default:
-		return string(t)
-	}
+	return string(t)
 }

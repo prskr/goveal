@@ -18,34 +18,32 @@ const (
 	StateTypeNested
 )
 
-var (
-	EventMapping = map[EventType][]byte{
-		EventTypeHorizontalSplit: []byte(`
+var EventMapping = map[EventType][]byte{
+	EventTypeHorizontalSplit: []byte(`
 </section>
 <section>`),
-		EventTypeVerticalSplit: []byte(`
+	EventTypeVerticalSplit: []byte(`
 </section>
 <section>
 <section>
 `),
-		EventTypeHorizontalEnd: []byte(`
+	EventTypeHorizontalEnd: []byte(`
 </section>
 `),
-		EventTypeVerticalSplitEnd: []byte(`
+	EventTypeVerticalSplitEnd: []byte(`
 </section>
 </section>
 <section>`),
-		EventTypeVerticalDocumentEnd: []byte(`
+	EventTypeVerticalDocumentEnd: []byte(`
 </section>
 </section>
 `),
-		EventTypeVerticalVerticalSplit: []byte(`
+	EventTypeVerticalVerticalSplit: []byte(`
 </section>
 </section>
 <section>
 <section>`),
-	}
-)
+}
 
 func NewStateMachine(verticalSplit, horizontalSplit string) *StateMachine {
 	return &StateMachine{

@@ -2,7 +2,5 @@ package assets
 
 import "embed"
 
-var (
-	//go:embed reveal mermaid/mermaid.min.js
-	Assets embed.FS
-)
+//go:embed reveal mermaid/mermaid.min.js
+var Assets embed.FS

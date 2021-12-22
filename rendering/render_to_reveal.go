@@ -47,6 +47,7 @@ type RevealRenderer struct {
 	hasNotes     bool
 }
 
+//nolint:gocyclo // under construction
 func (r *RevealRenderer) RenderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
 	switch b := node.(type) {
 	case *ast.Document:
@@ -82,7 +83,7 @@ func (r *RevealRenderer) RenderHook(w io.Writer, node ast.Node, entering bool) (
 		return ast.GoToNext, false
 	case *ast.HorizontalRule:
 		next := peekNextRuler(b)
-		var input = string(b.Literal)
+		input := string(b.Literal)
 		if next != nil {
 			input += string(next.Literal)
 		}
@@ -185,6 +186,7 @@ func getAttributesFromChildSpan(node ast.Node) []template.HTMLAttr {
 }
 
 func extractElementAttributes(htmlSpan *ast.HTMLSpan) (attrs []template.HTMLAttr) {
+	const expectedNumberOfMatches = 4
 	htmlComment := string(htmlSpan.Literal)
 	if htmlComment == "" {
 		return nil
@@ -192,7 +194,7 @@ func extractElementAttributes(htmlSpan *ast.HTMLSpan) (attrs []template.HTMLAttr
 	matches := htmlElementAttributesRegexp.FindAllStringSubmatch(htmlComment, -1)
 	attrs = make([]template.HTMLAttr, 0, len(matches))
 	for idx := range matches {
-		if len(matches[idx]) != 4 {
+		if len(matches[idx]) != expectedNumberOfMatches {
 			continue
 		}
 

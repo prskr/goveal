@@ -5,8 +5,10 @@ import (
 	"os"
 )
 
-type FS = fs.FS
-type File = fs.File
+type (
+	FS   = fs.FS
+	File = fs.File
+)
 
 var Dir = os.DirFS
 

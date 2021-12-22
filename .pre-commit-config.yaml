@@ -1,0 +1,18 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: v1.0.0-beta.5
+    hooks:
+      - id: go-mod-tidy-repo
+      - id: go-fumpt
+        args:
+          - -w
+      - id: go-imports
+        args:
+          - -local=github.com/baez90/goveal
+          - -w
+      - id: golangci-lint-repo-mod
+        args:
+          - --fast
+          - --fix
