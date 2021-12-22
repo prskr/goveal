@@ -1,0 +1,12 @@
+<section>
+    {{ if .Children }}
+        {{ range .Children }}
+            {{ .ToHTML }}
+        {{ end }}
+    {{ else }}
+        {{ renderMarkdown .Content }}
+    {{ end }}
+    {{ if .HasNotes }}
+        </aside>
+    {{ end }}
+</section>

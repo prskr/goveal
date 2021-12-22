@@ -91,6 +91,7 @@ for (var j = 0; j < i; j++) {
 ### Mermaid
 
 ```mermaid
+%%{init: {'theme': 'dark'}}%%
 flowchart LR
    a --> b & c--> d
 ```
@@ -102,7 +103,7 @@ flowchart LR
 {line-numbers="1-2|3|4"}
 
 ```js
-    let a = 1;
+let a = 1;
 let b = 2;
 let c = x => 1 + 2 + x;
 c(3);

@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", _ => {
         })
         .then(() => {
             subscribeToEvents()
-            console.info("finished initializing")
         })
 
 });
@@ -34,6 +33,7 @@ async function initReveal() {
     let cfg = await getRevealConfig()
     Reveal.initialize({
         controls: cfg.controls,
+        controlsLayout: cfg.controlsLayout,
         progress: cfg.progress,
         history: cfg.history,
         center: cfg.center,
@@ -44,6 +44,10 @@ async function initReveal() {
         menu: {
             numbers: cfg.menu.numbers,
             useTextContentForMissingTitles: cfg.menu.useTextContentForMissingTitles,
+            transitions: cfg.menu.transitions,
+            hideMissingTitles: cfg.hideMissingTitles,
+            markers: cfg.menu.markers,
+            openButton: cfg.menu.openButton,
             custom: [
                 {
                     title: 'Print',
@@ -64,7 +68,6 @@ async function initReveal() {
                 {name: 'Solarized', theme: '/reveal/dist/theme/solarized.css'},
                 {name: 'White', theme: '/reveal/dist/theme/white.css'}
             ],
-            transitions: true,
         },
         plugins: [RevealHighlight, RevealNotes, RevealMenu]
     })
@@ -87,20 +90,19 @@ function subscribeToEvents() {
     let source = new EventSource("/api/v1/events");
 
     source.onopen = (() => {
-        console.log("eventsource connection open");
+        console.debug("eventsource connection open");
     })
 
     source.onerror = (ev => {
         if (ev.target.readyState === 0) {
-            console.log("reconnecting to eventsource");
+            console.debug("reconnecting to eventsource");
         } else {
-            console.log("eventsource error", ev);
+            console.error("eventsource error", ev);
         }
     })
 
     source.onmessage = (ev => {
         let obj = JSON.parse(ev.data);
-        console.log(obj);
         switch (true) {
             case obj.forceReload:
                 window.location.reload()

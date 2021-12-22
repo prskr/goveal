@@ -1,25 +1,14 @@
 package api
 
 import (
-	"hash/fnv"
 	"io"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/html"
-	"github.com/gomarkdown/markdown/parser"
 	"go.uber.org/multierr"
 
 	"github.com/baez90/goveal/config"
 	"github.com/baez90/goveal/fs"
 	"github.com/baez90/goveal/rendering"
-)
-
-const (
-	parserExtensions = parser.NoIntraEmphasis | parser.Tables | parser.FencedCode |
-		parser.Autolink | parser.Strikethrough | parser.SpaceHeadings | parser.HeadingIDs |
-		parser.BackslashLineBreak | parser.DefinitionLists | parser.MathJax | parser.Titleblock |
-		parser.OrderedListStart | parser.Attributes
 )
 
 type Views struct {
@@ -54,20 +43,14 @@ func (p *Views) RenderedMarkdown(ctx *fiber.Ctx) (err error) {
 		return err
 	}
 
-	mdParser := parser.NewWithExtensions(parserExtensions)
-	rr := &rendering.RevealRenderer{
-		StateMachine: rendering.NewStateMachine("***", "---"),
-		Hash:         fnv.New32a(),
-	}
-	renderer := html.NewRenderer(html.RendererOptions{
-		Flags:          html.CommonFlags | html.HrefTargetBlank,
-		RenderNodeHook: rr.RenderHook,
-	})
-
-	ctx.Append(fiber.HeaderContentType, fiber.MIMETextHTML)
-	if _, err = ctx.Write(markdown.ToHTML(data, mdParser, renderer)); err != nil {
+	var rendered []byte
+	if rendered, err = rendering.ToHTML(string(data), p.cfg.Rendering); err != nil {
+		return err
+	} else if _, err = ctx.Write(rendered); err != nil {
 		return err
 	}
+
+	ctx.Append(fiber.HeaderContentType, fiber.MIMETextHTML)
 
 	return err
 }

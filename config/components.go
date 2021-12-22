@@ -13,6 +13,10 @@ var defaults = map[string]interface{}{
 	"slideNumber":                         true,
 	"menu.numbers":                        true,
 	"menu.useTextContentForMissingTitles": true,
+	"menu.transitions":                    true,
+	"menu.hideMissingTitles":              true,
+	"menu.markers":                        true,
+	"menu.openButton":                     true,
 }
 
 const (
@@ -51,7 +55,10 @@ type (
 		Menu           struct {
 			Numbers                        bool `json:"numbers"`
 			UseTextContentForMissingTitles bool `json:"useTextContentForMissingTitles"`
-			Transitions                    bool
+			Transitions                    bool `json:"transitions"`
+			HideMissingTitles              bool `json:"hideMissingTitles"`
+			Markers                        bool `json:"markers"`
+			OpenButton                     bool `json:"openButton"`
 		} `json:"menu"`
 	}
 	Components struct {

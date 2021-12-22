@@ -1,7 +1,7 @@
 theme: night
 codeTheme: monokai
-horizontalSeparator: ===
-verticalSeparator: ---
+horizontalSeparator: ---
+verticalSeparator: '\*\*\*'
 transition: convex
 controlsLayout: edges
 controls: true
@@ -12,6 +12,10 @@ slideNumber: true
 menu:
   numbers: false
   useTextContentForMissingTitles: true
+  transitions: true
+  hideMissingTitles: false
+  markers: true
+  openButton: true
 mermaid:
   theme: forest
 stylesheets:

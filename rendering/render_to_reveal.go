@@ -2,65 +2,26 @@ package rendering
 
 import (
 	"bytes"
-	"embed"
 	"encoding/hex"
 	"hash"
 	"html"
 	"html/template"
 	"io"
 	"path"
-	"regexp"
-	"sync"
 
-	"github.com/Masterminds/sprig/v3"
 	"github.com/gomarkdown/markdown/ast"
-)
-
-var (
-	//go:embed templates/*.gohtml
-	templatesFS              embed.FS
-	templates                *template.Template
-	templateRenderBufferPool = &sync.Pool{
-		New: func() interface{} {
-			return new(bytes.Buffer)
-		},
-	}
-	htmlElementAttributesRegexp = regexp.MustCompile(`(?P<key>[a-z]+(-[a-z]+)*)="(?P<value>.+)"`)
-	notesRegexp                 = regexp.MustCompile(`^(?i)notes?`)
 )
 
 const (
 	mermaidCodeBlock = "mermaid"
 )
 
-func init() {
-	var err error
-	templates = template.New("rendering").Funcs(sprig.FuncMap())
-	if templates, err = templates.ParseFS(templatesFS, "templates/*.gohtml"); err != nil {
-		panic(err)
-	}
-}
-
 type RevealRenderer struct {
-	StateMachine *StateMachine
-	Hash         hash.Hash
-	hasNotes     bool
+	Hash hash.Hash
 }
 
-//nolint:gocyclo // under construction
 func (r *RevealRenderer) RenderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
 	switch b := node.(type) {
-	case *ast.Document:
-		if entering {
-			_, _ = w.Write([]byte("<section>\n"))
-			if next := peekNextRuler(b); next != nil && string(next.Literal) == "***" {
-				_, _ = w.Write([]byte("<section>\n"))
-				r.StateMachine.CurrentState = StateTypeNested
-			}
-		} else {
-			_, _ = w.Write([]byte("</section>\n"))
-		}
-		return ast.GoToNext, false
 	case *ast.ListItem:
 		if entering {
 			return r.handleListItem(w, b)
@@ -72,7 +33,6 @@ func (r *RevealRenderer) RenderHook(w io.Writer, node ast.Node, entering bool) (
 		}
 		if notesRegexp.Match(b.Literal) {
 			_, err := w.Write([]byte(`<aside class="notes">`))
-			r.hasNotes = true
 			return ast.SkipChildren, err == nil
 		}
 		return ast.GoToNext, false
@@ -81,18 +41,6 @@ func (r *RevealRenderer) RenderHook(w io.Writer, node ast.Node, entering bool) (
 			return r.handleCodeBlock(w, b)
 		}
 		return ast.GoToNext, false
-	case *ast.HorizontalRule:
-		next := peekNextRuler(b)
-		input := string(b.Literal)
-		if next != nil {
-			input += string(next.Literal)
-		}
-		if r.hasNotes {
-			_, _ = w.Write([]byte(`</aside>`))
-			r.hasNotes = false
-		}
-		_, _ = w.Write(r.StateMachine.Accept(input))
-		return ast.GoToNext, true
 	case *ast.Image:
 		if entering {
 			return r.handleImage(w, b)
@@ -213,17 +161,6 @@ func renderCodeTemplate(templateName string, codeBlock *ast.CodeBlock) (output [
 	}
 
 	return renderTemplate(templateName, data)
-}
-
-func renderTemplate(templateName string, data interface{}) (output []byte, err error) {
-	buffer := templateRenderBufferPool.Get().(*bytes.Buffer)
-	defer func() {
-		buffer.Reset()
-		templateRenderBufferPool.Put(buffer)
-	}()
-
-	err = templates.ExecuteTemplate(buffer, templateName, data)
-	return buffer.Bytes(), err
 }
 
 func lineNumbers(attrs *ast.Attribute) string {
