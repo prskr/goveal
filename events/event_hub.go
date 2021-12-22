@@ -21,14 +21,15 @@ const (
 )
 
 type (
-	ReloadTrigger interface {
-		Triggers(ev fs.Event) bool
+	EventMutation interface {
+		OnEvent(in ContentEvent, ev fs.Event) (out ContentEvent)
 	}
 	ContentEvent struct {
 		File         string `json:"file"`
 		FileNameHash string `json:"fileNameHash"`
 		Timestamp    string `json:"ts"`
 		ForceReload  bool   `json:"forceReload"`
+		ReloadConfig bool   `json:"reloadConfig"`
 	}
 	EventSource interface {
 		io.Closer
@@ -43,30 +44,35 @@ type (
 		EventHandler
 		OnError chan error
 	}
-	FileNameTrigger   string
-	FileSuffixTrigger string
+	MutationReloadForFile       string
+	MutationConfigReloadForFile string
 )
 
-func (t FileNameTrigger) Triggers(ev fs.Event) bool {
-	fileBase := filepath.Base(ev.File)
-	return strings.EqualFold(fileBase, string(t))
+func (t MutationReloadForFile) OnEvent(in ContentEvent, ev fs.Event) (out ContentEvent) {
+	if strings.EqualFold(filepath.Base(ev.File), string(t)) {
+		in.ForceReload = true
+	}
+	return in
 }
 
-func (t FileSuffixTrigger) Triggers(ev fs.Event) bool {
-	return strings.HasSuffix(strings.ToLower(filepath.Base(ev.File)), strings.ToLower(string(t)))
+func (t MutationConfigReloadForFile) OnEvent(in ContentEvent, ev fs.Event) (out ContentEvent) {
+	if strings.EqualFold(filepath.Base(ev.File), string(t)) {
+		in.ReloadConfig = true
+	}
+	return in
 }
 
 func (f EventHandlerFunc) OnEvent(ev ContentEvent) error {
 	return f(ev)
 }
 
-func NewEventHub(eventSource EventSource, fileNameHash hash.Hash, triggers ...ReloadTrigger) *EventHub {
+func NewEventHub(eventSource EventSource, fileNameHash hash.Hash, mutations ...EventMutation) *EventHub {
 	hub := &EventHub{
-		FileNameHash:   fileNameHash,
-		reloadTriggers: triggers,
-		source:         eventSource,
-		subscriptions:  make(map[uuid.UUID]*subscription),
-		done:           make(chan struct{}),
+		FileNameHash:  fileNameHash,
+		mutations:     mutations,
+		source:        eventSource,
+		subscriptions: make(map[uuid.UUID]*subscription),
+		done:          make(chan struct{}),
 	}
 
 	go hub.processEvents()
@@ -75,12 +81,12 @@ func NewEventHub(eventSource EventSource, fileNameHash hash.Hash, triggers ...Re
 }
 
 type EventHub struct {
-	FileNameHash   hash.Hash
-	reloadTriggers []ReloadTrigger
-	lock           sync.RWMutex
-	done           chan struct{}
-	source         EventSource
-	subscriptions  map[uuid.UUID]*subscription
+	FileNameHash  hash.Hash
+	mutations     []EventMutation
+	lock          sync.RWMutex
+	done          chan struct{}
+	source        EventSource
+	subscriptions map[uuid.UUID]*subscription
 }
 
 func (h *EventHub) Subscribe(handler EventHandler) (id uuid.UUID, onError <-chan error) {
@@ -129,18 +135,14 @@ func (h *EventHub) notifySubscribers(ev fs.Event) {
 	h.lock.RLock()
 	defer h.lock.RUnlock()
 
-	var triggerReload bool
-	for idx := range h.reloadTriggers {
-		if triggerReload = h.reloadTriggers[idx].Triggers(ev); triggerReload {
-			break
-		}
-	}
-
 	ce := ContentEvent{
 		File:         fmt.Sprintf("/%s", ev.File),
 		Timestamp:    strconv.FormatInt(ev.Timestamp.Unix(), baseDecimal),
-		ForceReload:  triggerReload,
 		FileNameHash: hex.EncodeToString(h.FileNameHash.Sum([]byte(path.Base(ev.File)))),
+	}
+
+	for idx := range h.mutations {
+		ce = h.mutations[idx].OnEvent(ce, ev)
 	}
 
 	for _, handler := range h.subscriptions {

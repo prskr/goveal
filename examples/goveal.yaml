@@ -3,6 +3,16 @@ codeTheme: monokai
 horizontalSeparator: ===
 verticalSeparator: ---
 transition: convex
-menu.numbers: false
+controlsLayout: edges
+controls: true
+progress: true
+history: true
+center: true
+slideNumber: true
+menu:
+  numbers: false
+  useTextContentForMissingTitles: true
+mermaid:
+  theme: forest
 stylesheets:
   - custom.css

@@ -3,9 +3,10 @@ package config
 var (
 	defaults = map[string]interface{}{
 		"mermaid.theme":                       "forest",
-		"reveal.theme":                        "beige",
+		"theme":                               "beige",
 		"codeTheme":                           "monokai",
 		"transition":                          TransitionNone,
+		"controlsLayout":                      ControlsLayoutEdges,
 		"controls":                            true,
 		"progress":                            true,
 		"history":                             true,
@@ -23,11 +24,15 @@ const (
 	TransitionConvex  Transition = "convex"
 	TransitionConcave Transition = "concave"
 	TransitionZoom    Transition = "zoom"
+
+	ControlsLayoutBottomRight ControlsLayout = "bottom-right"
+	ControlsLayoutEdges       ControlsLayout = "edges"
 )
 
 type (
-	Transition string
-	Mermaid    struct {
+	Transition     string
+	ControlsLayout string
+	Mermaid        struct {
 		Theme string `json:"theme"`
 	}
 	Rendering struct {
@@ -36,15 +41,16 @@ type (
 		Stylesheets         []string
 	}
 	Reveal struct {
-		Theme       string     `json:"theme"`
-		CodeTheme   string     `json:"codeTheme"`
-		Transition  Transition `json:"transition"`
-		Controls    bool       `json:"controls"`
-		Progress    bool       `json:"progress"`
-		History     bool       `json:"history"`
-		Center      bool       `json:"center"`
-		SlideNumber bool       `json:"slideNumber"`
-		Menu        struct {
+		Theme          string         `json:"theme"`
+		CodeTheme      string         `json:"codeTheme"`
+		Transition     Transition     `json:"transition"`
+		Controls       bool           `json:"controls"`
+		ControlsLayout ControlsLayout `json:"controlsLayout"`
+		Progress       bool           `json:"progress"`
+		History        bool           `json:"history"`
+		Center         bool           `json:"center"`
+		SlideNumber    bool           `json:"slideNumber"`
+		Menu           struct {
 			Numbers                        bool `json:"numbers"`
 			UseTextContentForMissingTitles bool `json:"useTextContentForMissingTitles"`
 			Transitions                    bool

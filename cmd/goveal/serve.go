@@ -51,8 +51,8 @@ var (
 			hub := events.NewEventHub(
 				wdfs,
 				fnv.New32a(),
-				events.FileNameTrigger(args[0]),
-				events.FileNameTrigger(filepath.Base(cfg.ConfigFileInUse)),
+				events.MutationReloadForFile(args[0]),
+				events.MutationConfigReloadForFile(filepath.Base(cfg.ConfigFileInUse)),
 			)
 
 			api.NoCache(app)

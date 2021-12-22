@@ -25,9 +25,13 @@ async function setSlidesContent() {
     document.getElementById("content-root").innerHTML = contentDocument.documentElement.innerHTML
 }
 
-async function initReveal() {
+async function getRevealConfig() {
     let resp = await fetch('/api/v1/config/reveal')
-    let cfg = await resp.json()
+    return await resp.json()
+}
+
+async function initReveal() {
+    let cfg = await getRevealConfig()
     Reveal.initialize({
         controls: cfg.controls,
         progress: cfg.progress,
@@ -97,20 +101,27 @@ function subscribeToEvents() {
     source.onmessage = (ev => {
         let obj = JSON.parse(ev.data);
         console.log(obj);
-        if (obj.forceReload) {
-            window.location.reload()
-        } else {
-            switch (true) {
-                case obj.file.endsWith(".css"):
-                    let cssLink = document.querySelector(`link[rel=stylesheet][id="${obj.fileNameHash}"]`);
-                    cssLink.href = `${obj.file}?ts=${obj.ts}`
-                    break
-                default:
-                    let elem = document.getElementById(obj.fileNameHash);
-                    if (elem !== null) {
-                        elem.src = `${obj.file}?ts=${obj.ts}`
-                    }
-            }
+        switch (true) {
+            case obj.forceReload:
+                window.location.reload()
+                break
+            case obj.reloadConfig:
+                getRevealConfig().then(cfg => {
+                    Reveal.configure(cfg)
+                })
+                break
+            default:
+                switch (true) {
+                    case obj.file.endsWith(".css"):
+                        let cssLink = document.querySelector(`link[rel=stylesheet][id="${obj.fileNameHash}"]`);
+                        cssLink.href = `${obj.file}?ts=${obj.ts}`
+                        break
+                    default:
+                        let elem = document.getElementById(obj.fileNameHash);
+                        if (elem !== null) {
+                            elem.src = `${obj.file}?ts=${obj.ts}`
+                        }
+                }
         }
     })
 }
