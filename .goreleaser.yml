@@ -20,6 +20,19 @@ builds:
       - goos: linux
         goarch: arm
         goarm: '7'
+
+dockers:
+  - id: goveal
+    goos: linux
+    goarch: amd64
+    goarm: ''
+    ids:
+      - goveal
+    image_templates:
+      - ghcr.io/baez90/goveal:{{ .Tag }}
+      - ghcr.io/baez90/goveal:{{ .Major }}
+    dockerfile: ./build/docker/goveal.dockerfile
+
 archives:
   - replacements:
       darwin: Darwin

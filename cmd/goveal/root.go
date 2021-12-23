@@ -49,5 +49,4 @@ It is not required to restart the server when you edit the markdown - a simple r
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-reveal-slides.yaml)")
-	rootCmd.PersistentFlags().StringVar(&workingDir, "working-dir", workingDir, "working directory to use")
 }

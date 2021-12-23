@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	defaultListeningPort uint16 = 3000
+	defaultListeningPort uint16 = 2233
 	defaultHost                 = "127.0.0.1"
 )
 
