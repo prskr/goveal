@@ -1,8 +1,15 @@
 package config
 
+const (
+	defaultWidth  uint = 960
+	defaultHeight uint = 700
+)
+
 var defaults = map[string]interface{}{
 	"mermaid.theme":                       "forest",
 	"theme":                               "beige",
+	"width":                               defaultWidth,
+	"height":                              defaultHeight,
 	"codeTheme":                           "monokai",
 	"verticalSeparator":                   `\*\*\*`,
 	"horizontalSeparator":                 `---`,
@@ -54,6 +61,8 @@ type (
 		History        bool           `json:"history"`
 		Center         bool           `json:"center"`
 		SlideNumber    bool           `json:"slideNumber"`
+		Width          uint           `json:"width"`
+		Height         uint           `json:"height"`
 		Menu           struct {
 			Numbers                        bool `json:"numbers"`
 			UseTextContentForMissingTitles bool `json:"useTextContentForMissingTitles"`

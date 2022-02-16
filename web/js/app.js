@@ -39,6 +39,8 @@ async function initReveal() {
         center: cfg.center,
         slideNumber: cfg.slideNumber,
         transition: cfg.transition,
+        width: cfg.width,
+        height: cfg.height,
         hash: true,
         pdfSeparateFragments: false,
         menu: {
