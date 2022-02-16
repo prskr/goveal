@@ -24,11 +24,11 @@ func Load(workingDir, configFile string) (cfg *Components, err error) {
 		return nil, err
 	} else {
 		loader.AddConfigPath(home)
+		loader.AddConfigPath(workingDir)
+		loader.SetConfigName("goveal")
+		loader.SetConfigType("yaml")
 	}
 
-	loader.AddConfigPath(workingDir)
-	loader.SetConfigName("goveal")
-	loader.SetConfigType("yaml")
 	loader.AutomaticEnv()
 
 	if err = loader.ReadInConfig(); err == nil {
