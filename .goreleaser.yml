@@ -21,6 +21,12 @@ builds:
         goarch: arm
         goarm: '7'
 
+release:
+  github:
+    owner: baez90
+    name: goveal
+  mode: replace
+
 dockers:
   - id: goveal
     goos: linux
