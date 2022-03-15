@@ -107,6 +107,8 @@ issues:
       linters:
         - gomnd
         - funlen
+  new: true
+  fix: true
 
 run:
   build-tags:
