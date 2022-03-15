@@ -1,7 +1,10 @@
 package api
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"encoding/json"
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 
 	"github.com/baez90/goveal/config"
 )
@@ -10,16 +13,24 @@ type ConfigAPI struct {
 	cfg *config.Components
 }
 
-func RegisterConfigAPI(app *fiber.App, cfg *config.Components) {
+func RegisterConfigAPI(router *httprouter.Router, cfg *config.Components) {
 	cfgAPI := &ConfigAPI{cfg: cfg}
-	app.Get("/api/v1/config/reveal", cfgAPI.RevealConfig)
-	app.Get("/api/v1/config/mermaid", cfgAPI.MermaidConfig)
+	router.GET("/api/v1/config/reveal", cfgAPI.RevealConfig)
+	router.GET("/api/v1/config/mermaid", cfgAPI.MermaidConfig)
 }
 
-func (a *ConfigAPI) RevealConfig(ctx *fiber.Ctx) error {
-	return ctx.JSON(a.cfg.Reveal)
+func (a *ConfigAPI) RevealConfig(writer http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	writer.Header().Set("Content-Type", "application/json")
+	enc := json.NewEncoder(writer)
+	if err := enc.Encode(a.cfg.Reveal); err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
-func (a *ConfigAPI) MermaidConfig(ctx *fiber.Ctx) error {
-	return ctx.JSON(a.cfg.Mermaid)
+func (a *ConfigAPI) MermaidConfig(writer http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	writer.Header().Set("Content-Type", "application/json")
+	enc := json.NewEncoder(writer)
+	if err := enc.Encode(a.cfg.Mermaid); err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+	}
 }

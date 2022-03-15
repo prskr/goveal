@@ -89,13 +89,13 @@ async function initMermaid() {
 }
 
 function subscribeToEvents() {
-    let source = new EventSource("/api/v1/events");
+    let eventSource = new EventSource("/api/v1/events");
 
-    source.onopen = (() => {
+    eventSource.onopen = (() => {
         console.debug("eventsource connection open");
     })
 
-    source.onerror = (ev => {
+    eventSource.onerror = (ev => {
         if (ev.target.readyState === 0) {
             console.debug("reconnecting to eventsource");
         } else {
@@ -103,10 +103,11 @@ function subscribeToEvents() {
         }
     })
 
-    source.onmessage = (ev => {
+    eventSource.onmessage = (ev => {
         let obj = JSON.parse(ev.data);
         switch (true) {
             case obj.forceReload:
+                eventSource.close()
                 window.location.reload()
                 break
             case obj.reloadConfig:

@@ -1,17 +1,15 @@
 package main
 
 import (
-	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"net/http"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/template/html"
+	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"go.uber.org/multierr"
@@ -20,7 +18,6 @@ import (
 	"github.com/baez90/goveal/config"
 	"github.com/baez90/goveal/events"
 	"github.com/baez90/goveal/fs"
-	"github.com/baez90/goveal/web"
 )
 
 const (
@@ -52,31 +49,22 @@ var (
 			}
 			_ = mdFile.Close()
 
-			app := fiber.New(fiber.Config{
-				Views: html.NewFileSystem(http.FS(web.WebFS), ".gohtml").
-					AddFunc("fileId", func(fileName string) string {
-						h := fnv.New32a()
-						return hex.EncodeToString(h.Sum([]byte(path.Base(fileName))))
-					}),
-				AppName:               "goveal",
-				GETOnly:               true,
-				DisableStartupMessage: true,
-				StreamRequestBody:     true,
-			})
+			router := httprouter.New()
+
 			hub := events.NewEventHub(
+				log.StandardLogger(),
 				wdfs,
 				fnv.New32a(),
 				events.MutationReloadForFile(args[0]),
 				events.MutationConfigReloadForFile(filepath.Base(cfg.ConfigFileInUse)),
 			)
 
-			api.NoCache(app)
-			api.RegisterViews(app, wdfs, args[0], cfg)
-			api.RegisterEventsAPI(app, hub, log.StandardLogger())
-			api.RegisterConfigAPI(app, cfg)
-			if err := api.RegisterStaticFileHandling(app, wdfs); err != nil {
-				return err
-			}
+			api.RegisterViews(router, log.StandardLogger(), wdfs, args[0], cfg)
+			api.RegisterEventsAPI(router, hub, log.StandardLogger())
+			api.RegisterConfigAPI(router, cfg)
+
+			handler := api.FileSystemMiddleware(router, wdfs)
+			handler = api.NoCache(handler)
 
 			if openBrowser {
 				log.Info("Opening browser...")
@@ -84,7 +72,13 @@ var (
 			}
 
 			log.Infof("Listening on %s:%d", host, port)
-			return app.Listen(fmt.Sprintf("%s:%d", host, port))
+			if err := http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), handler); err != nil {
+				if errors.Is(err, http.ErrServerClosed) {
+					return nil
+				}
+				return err
+			}
+			return nil
 		},
 	}
 )

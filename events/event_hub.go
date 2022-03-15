@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/baez90/goveal/fs"
 )
@@ -38,18 +39,15 @@ type (
 	}
 	EventHandler interface {
 		OnEvent(ev ContentEvent) error
+		Close() error
 	}
-	EventHandlerFunc func(ev ContentEvent) error
-	subscription     struct {
-		EventHandler
-		OnError chan error
-	}
+	EventHandlerFunc            func(ev ContentEvent) error
 	MutationReloadForFile       string
 	MutationConfigReloadForFile string
 )
 
 func (t MutationReloadForFile) OnEvent(in ContentEvent, ev fs.Event) (out ContentEvent) {
-	if strings.EqualFold(filepath.Base(ev.File), string(t)) {
+	if strings.EqualFold(filepath.Base(ev.File), filepath.Base(string(t))) {
 		in.ForceReload = true
 	}
 	return in
@@ -66,12 +64,13 @@ func (f EventHandlerFunc) OnEvent(ev ContentEvent) error {
 	return f(ev)
 }
 
-func NewEventHub(eventSource EventSource, fileNameHash hash.Hash, mutations ...EventMutation) *EventHub {
+func NewEventHub(logger *log.Logger, eventSource EventSource, fileNameHash hash.Hash, mutations ...EventMutation) *EventHub {
 	hub := &EventHub{
+		Logger:        logger,
 		FileNameHash:  fileNameHash,
 		mutations:     mutations,
 		source:        eventSource,
-		subscriptions: make(map[uuid.UUID]*subscription),
+		subscriptions: make(map[uuid.UUID]EventHandler),
 		done:          make(chan struct{}),
 	}
 
@@ -82,31 +81,35 @@ func NewEventHub(eventSource EventSource, fileNameHash hash.Hash, mutations ...E
 
 type EventHub struct {
 	FileNameHash  hash.Hash
+	Logger        *log.Logger
 	mutations     []EventMutation
 	lock          sync.RWMutex
 	done          chan struct{}
 	source        EventSource
-	subscriptions map[uuid.UUID]*subscription
+	subscriptions map[uuid.UUID]EventHandler
 }
 
-func (h *EventHub) Subscribe(handler EventHandler) (id uuid.UUID, onError <-chan error) {
+func (h *EventHub) Subscribe(handler EventHandler) (id uuid.UUID) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 
-	s := &subscription{
-		EventHandler: handler,
-		OnError:      make(chan error),
-	}
 	clientID := uuid.New()
-	h.subscriptions[clientID] = s
+	h.subscriptions[clientID] = handler
 
-	return clientID, s.OnError
+	return clientID
 }
 
-func (h *EventHub) Unsubscribe(id uuid.UUID) {
+func (h *EventHub) Unsubscribe(id uuid.UUID) (err error) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
-	delete(h.subscriptions, id)
+
+	if handler, ok := h.subscriptions[id]; ok {
+		err = handler.Close()
+		delete(h.subscriptions, id)
+		return err
+	}
+
+	return nil
 }
 
 func (h *EventHub) Close() error {
@@ -147,7 +150,7 @@ func (h *EventHub) notifySubscribers(ev fs.Event) {
 
 	for _, handler := range h.subscriptions {
 		if err := handler.OnEvent(ce); err != nil {
-			handler.OnError <- err
+			h.Logger.Errorf("Failed to propagate event: %v", err)
 		}
 	}
 }

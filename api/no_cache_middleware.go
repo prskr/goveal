@@ -1,12 +1,12 @@
 package api
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"net/http"
+)
 
-func NoCache(app *fiber.App) {
-	app.Use(NoCacheHandler)
-}
-
-func NoCacheHandler(ctx *fiber.Ctx) error {
-	ctx.Response().Header.Set("Cache-Control", "no-cache")
-	return ctx.Next()
+func NoCache(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Cache-Control", "no-cache")
+		handler.ServeHTTP(writer, request)
+	})
 }

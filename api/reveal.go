@@ -1,31 +1,33 @@
 package api
 
 import (
+	"io"
 	"net/http"
+	"path"
 	"strings"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"time"
 
 	"github.com/baez90/goveal/assets"
 	"github.com/baez90/goveal/fs"
 	"github.com/baez90/goveal/web"
 )
 
-func RegisterStaticFileHandling(app *fiber.App, wdfs fs.FS) error {
+func FileSystemMiddleware(fallthroughHandler http.Handler, wdfs fs.FS) http.Handler {
 	layers := []fs.FS{wdfs}
 	layers = append([]fs.FS{web.WebFS, assets.Assets}, layers...)
 
 	layeredFS := fs.Layered{Layers: layers}
-	fsMiddleware := filesystem.New(filesystem.Config{
-		Root: http.FS(layeredFS),
-		Next: func(c *fiber.Ctx) bool {
-			_, err := layeredFS.Open(strings.TrimLeft(c.Path(), "/"))
-			return err != nil
-		},
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		reqPath := strings.TrimPrefix(req.URL.Path, "/")
+		if f, err := layeredFS.Open(reqPath); err != nil {
+			fallthroughHandler.ServeHTTP(writer, req)
+			return
+		} else if readSeeker, ok := f.(io.ReadSeeker); ok {
+			http.ServeContent(writer, req, path.Base(reqPath), time.Now(), readSeeker)
+			_ = f.Close()
+		} else {
+			_ = f.Close()
+			fallthroughHandler.ServeHTTP(writer, req)
+		}
 	})
-
-	app.Use(fsMiddleware)
-
-	return nil
 }

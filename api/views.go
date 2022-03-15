@@ -1,56 +1,99 @@
 package api
 
 import (
+	"encoding/hex"
+	"hash/fnv"
+	"html/template"
 	"io"
+	"net/http"
+	"path"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/Masterminds/sprig/v3"
+	"github.com/julienschmidt/httprouter"
+	log "github.com/sirupsen/logrus"
 	"go.uber.org/multierr"
 
 	"github.com/baez90/goveal/config"
 	"github.com/baez90/goveal/fs"
 	"github.com/baez90/goveal/rendering"
+	"github.com/baez90/goveal/web"
 )
 
+var indexTmpl *template.Template
+
+func init() {
+	if t, err := template.
+		New("index").
+		Funcs(sprig.FuncMap()).
+		Funcs(map[string]interface{}{
+			"fileId": func(fileName string) string {
+				h := fnv.New32a()
+				return hex.EncodeToString(h.Sum([]byte(path.Base(fileName))))
+			},
+		}).
+		ParseFS(web.WebFS, "*.gohtml"); err != nil {
+		panic(err)
+	} else {
+		indexTmpl = t
+	}
+}
+
 type Views struct {
+	logger     *log.Logger
 	cfg        *config.Components
 	wdfs       fs.FS
 	mdFilepath string
 }
 
-func RegisterViews(app *fiber.App, wdfs fs.FS, mdFilepath string, cfg *config.Components) {
-	p := &Views{cfg: cfg, wdfs: wdfs, mdFilepath: mdFilepath}
-	app.Get("/", p.IndexPage)
-	app.Get("/index.html", p.IndexPage)
-	app.Get("/index.htm", p.IndexPage)
-	app.Get("/slides", p.RenderedMarkdown)
+func RegisterViews(router *httprouter.Router, logger *log.Logger, wdfs fs.FS, mdFilepath string, cfg *config.Components) {
+	p := &Views{
+		logger:     logger,
+		cfg:        cfg,
+		wdfs:       wdfs,
+		mdFilepath: mdFilepath,
+	}
+	router.GET("/", p.IndexPage)
+	router.GET("/index.html", p.IndexPage)
+	router.GET("/index.htm", p.IndexPage)
+	router.GET("/slides", p.RenderedMarkdown)
 }
 
-func (p *Views) IndexPage(ctx *fiber.Ctx) error {
-	return ctx.Render("index", fiber.Map{
+func (p *Views) IndexPage(writer http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+	writer.Header().Set("Content-Type", "text/html")
+	if err := indexTmpl.ExecuteTemplate(writer, "index.gohtml", map[string]interface{}{
 		"Reveal":    p.cfg.Reveal,
 		"Rendering": p.cfg.Rendering,
-	})
+	}); err != nil {
+		p.logger.Errorf("Failed to render template: %v", err)
+		writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = writer.Write([]byte(err.Error()))
+	}
 }
 
-func (p *Views) RenderedMarkdown(ctx *fiber.Ctx) (err error) {
+func (p *Views) RenderedMarkdown(writer http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	f, err := p.wdfs.Open(p.mdFilepath)
 	if err != nil {
-		return err
+		writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = writer.Write([]byte(err.Error()))
+		return
 	}
 	defer multierr.AppendInvoke(&err, multierr.Close(f))
 	data, err := io.ReadAll(f)
 	if err != nil {
-		return err
+		writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = writer.Write([]byte(err.Error()))
+		return
 	}
 
+	writer.Header().Set("Content-Type", "text/html")
 	var rendered []byte
 	if rendered, err = rendering.ToHTML(string(data), p.cfg.Rendering); err != nil {
-		return err
-	} else if _, err = ctx.Write(rendered); err != nil {
-		return err
+		writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = writer.Write([]byte(err.Error()))
+		return
+	} else if _, err = writer.Write(rendered); err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = writer.Write([]byte(err.Error()))
+		return
 	}
-
-	ctx.Append(fiber.HeaderContentType, fiber.MIMETextHTML)
-
-	return err
 }

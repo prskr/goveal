@@ -1,13 +1,14 @@
 package api
 
 import (
-	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/baez90/goveal/events"
@@ -25,50 +26,68 @@ func (h ContentEventHandler) OnEvent(ce events.ContentEvent) error {
 	}
 }
 
+func (h ContentEventHandler) Close() (err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = fmt.Errorf("failed to close event handler: %v", rec)
+		}
+	}()
+
+	close(h)
+	return
+}
+
 type Events struct {
 	logger *log.Logger
 	hub    *events.EventHub
 }
 
-func RegisterEventsAPI(app *fiber.App, hub *events.EventHub, logger *log.Logger) {
+func RegisterEventsAPI(router *httprouter.Router, hub *events.EventHub, logger *log.Logger) {
 	ev := &Events{hub: hub, logger: logger}
-	app.Get("/api/v1/events", ev.EventHandler)
+	router.GET("/api/v1/events", ev.EventHandler)
+
 }
 
-func (e *Events) EventHandler(fc *fiber.Ctx) error {
+func (e *Events) EventHandler(writer http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	writer.Header().Set("Content-Type", "text/event-stream")
+	writer.Header().Set("Cache-Control", "no-cache")
+	writer.Header().Set("Connection", "keep-alive")
+	writer.Header().Set("Access-Control-Allow-Origin", "*")
+	writer.Header().Set("Transfer-Encoding", "chunked")
+	writer.Header().Set("Access-Control-Allow-Headers", "Cache-Control")
+	writer.Header().Set("Access-Control-Allow-Credentials", "true")
+
 	var (
-		ctx               = fc.Context()
-		handler           = make(ContentEventHandler)
-		clientID, onError = e.hub.Subscribe(handler)
+		handler  = make(ContentEventHandler)
+		clientID = e.hub.Subscribe(handler)
+		buf      = new(bytes.Buffer)
+		enc      = json.NewEncoder(buf)
 	)
 
-	ctx.SetContentType("text/event-stream")
-	ctx.Response.Header.Set("Cache-Control", "no-cache")
-	ctx.Response.Header.Set("Connection", "keep-alive")
-	ctx.Response.Header.Set("Transfer-Encoding", "chunked")
-	ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
-	ctx.Response.Header.Set("Access-Control-Allow-Headers", "Cache-Control")
-	ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
-
-	ctx.SetBodyStreamWriter(func(w *bufio.Writer) {
-		for ev := range handler {
-			if msg, err := json.Marshal(ev); err != nil {
-				e.logger.Errorf("Failed to marshal to JSON: %v", err)
-				continue
-			} else if _, err = fmt.Fprintf(w, "data: %s\n\n", string(msg)); err != nil {
-				e.logger.Errorf("Failed to write to client: %v", err)
-				continue
-			} else if err = w.Flush(); err != nil {
-				e.hub.Unsubscribe(clientID)
-			}
-		}
-	})
-
-	go func() {
-		for err := range onError {
-			e.logger.Errorf("Error while sending events to client: %v", err)
+	defer func() {
+		if err := e.hub.Unsubscribe(clientID); err != nil {
+			e.logger.Warnf("Error occurred while unsubscribing: %v", err)
 		}
 	}()
 
-	return nil
+	for {
+		select {
+		case ev := <-handler:
+			if err := enc.Encode(ev); err != nil {
+				e.logger.Errorf("Failed to marshal to JSON: %v", err)
+				continue
+			} else if _, err = fmt.Fprintf(writer, "data: %s\n\n", buf.String()); err != nil {
+				e.logger.Errorf("Failed to write to client: %v", err)
+				return
+			} else if f, ok := writer.(http.Flusher); !ok {
+				e.logger.Errorf("Cannot flush data")
+				writer.WriteHeader(http.StatusBadRequest)
+				return
+			} else {
+				f.Flush()
+			}
+		case <-req.Context().Done():
+			return
+		}
+	}
 }
