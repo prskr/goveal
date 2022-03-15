@@ -31,7 +31,7 @@ jobs:
         uses: arduino/setup-task@v1
       
       - name: Build & test
-        run: task download-reveal test
+        run: task download-assets test
       
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2

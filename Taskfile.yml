@@ -86,7 +86,7 @@ tasks:
     cmds:
       - goreleaser --snapshot --skip-publish --rm-dist
 
-  download-reveal:
+  download-assets:
     sources:
       - Taskfile.yml
     cmds:
