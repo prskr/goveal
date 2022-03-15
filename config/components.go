@@ -5,7 +5,7 @@ const (
 	defaultHeight uint = 700
 )
 
-var defaults = map[string]interface{}{
+var defaults = map[string]any{
 	"mermaid.theme":                       "forest",
 	"theme":                               "beige",
 	"width":                               defaultWidth,

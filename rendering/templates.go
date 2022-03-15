@@ -1,29 +1,23 @@
 package rendering
 
 import (
-	"bytes"
 	"embed"
 	"hash/fnv"
 	"html/template"
-	"sync"
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/gomarkdown/markdown"
 	mdhtml "github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+	"github.com/valyala/bytebufferpool"
 
 	"github.com/baez90/goveal/rendering/emoji"
 )
 
 var (
 	//go:embed templates/*.gohtml
-	templatesFS              embed.FS
-	templates                *template.Template
-	templateRenderBufferPool = &sync.Pool{
-		New: func() interface{} {
-			return new(bytes.Buffer)
-		},
-	}
+	templatesFS embed.FS
+	templates   *template.Template
 )
 
 func init() {
@@ -54,11 +48,11 @@ func init() {
 	}
 }
 
-func renderTemplate(templateName string, data interface{}) (output []byte, err error) {
-	buffer := templateRenderBufferPool.Get().(*bytes.Buffer)
+func renderTemplate(templateName string, data any) (output []byte, err error) {
+	buffer := bytebufferpool.Get()
 	defer func() {
 		buffer.Reset()
-		templateRenderBufferPool.Put(buffer)
+		bytebufferpool.Put(buffer)
 	}()
 
 	err = templates.ExecuteTemplate(buffer, templateName, data)

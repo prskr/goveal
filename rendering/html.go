@@ -1,12 +1,12 @@
 package rendering
 
 import (
-	"bytes"
 	"fmt"
 	"html/template"
 	"regexp"
 
 	"github.com/gomarkdown/markdown/parser"
+	"github.com/valyala/bytebufferpool"
 
 	"github.com/baez90/goveal/config"
 )
@@ -24,17 +24,17 @@ func ToHTML(markdown string, renderCfg config.Rendering) (rendered []byte, err e
 		return nil, err
 	}
 
-	buf := templateRenderBufferPool.Get().(*bytes.Buffer)
+	buf := bytebufferpool.Get()
 	defer func() {
 		buf.Reset()
-		templateRenderBufferPool.Put(buf)
+		bytebufferpool.Put(buf)
 	}()
 
 	for idx := range slides {
 		if rendered, err := slides[idx].ToHTML(); err != nil {
 			return nil, err
 		} else {
-			buf.WriteString(string(rendered))
+			_, _ = buf.WriteString(string(rendered))
 		}
 	}
 
