@@ -11,6 +11,8 @@ import (
 	"github.com/gomarkdown/markdown"
 	mdhtml "github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+
+	"github.com/baez90/goveal/rendering/emoji"
 )
 
 var (
@@ -32,7 +34,10 @@ func init() {
 				rr := &RevealRenderer{
 					Hash: fnv.New32a(),
 				}
+
+				emojis := emoji.NewEmojiParser()
 				mdParser := parser.NewWithExtensions(parserExtensions)
+				mdParser.Opts.ParserHook = emojis.EmojiParser
 				renderer := mdhtml.NewRenderer(mdhtml.RendererOptions{
 					Flags:          mdhtml.CommonFlags | mdhtml.HrefTargetBlank,
 					RenderNodeHook: rr.RenderHook,

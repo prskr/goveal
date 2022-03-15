@@ -45,7 +45,6 @@ type Events struct {
 func RegisterEventsAPI(router *httprouter.Router, hub *events.EventHub, logger *log.Logger) {
 	ev := &Events{hub: hub, logger: logger}
 	router.GET("/api/v1/events", ev.EventHandler)
-
 }
 
 func (e *Events) EventHandler(writer http.ResponseWriter, req *http.Request, _ httprouter.Params) {
