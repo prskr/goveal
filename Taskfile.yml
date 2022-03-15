@@ -2,8 +2,9 @@ version: '3'
 
 vars:
   DEBUG_PORT: 2345
-  REVEALJS_VERSION: 4.1.2
-  HIGHLIGHTJS_VERSION: 11.3.1
+  REVEALJS_VERSION: 4.3.0
+  HIGHLIGHTJS_VERSION: 11.5.0
+  MERMAID_VERSION: 8.14.0
   BINARY_NAME: goveal
   OUT_DIR: ./out
   GO_BUILD_ARGS: -ldflags="-w -s"
@@ -32,6 +33,8 @@ tasks:
       - "{{ .GOBIN }}goimports -w -local github.com/baez90/goveal ./."
 
   deps:
+    deps:
+      - download-assets
     sources:
       - go.mod
       - go.sum
@@ -85,18 +88,20 @@ tasks:
     cmds:
       - goreleaser --snapshot --skip-publish --rm-dist
 
-  download-reveal:
+  download-assets:
     sources:
       - Taskfile.yml
     cmds:
       - rm -rf ./assets/reveal
-      - mkdir -p ./assets/reveal
+      - mkdir -p ./assets/reveal ./assets/mermaid
       - curl -sL https://github.com/hakimel/reveal.js/archive/{{ .REVEALJS_VERSION }}.tar.gz | tar -xvz --strip-components=1 -C ./assets/reveal --wildcards "*.js" --wildcards "*.css" --wildcards "*.html" --wildcards "*.woff" --wildcards "*.ttf" --exclude "test" --exclude "gulpfile.js" --exclude "gruntfile.js"  --exclude "demo.html" --exclude "index.html" --exclude "examples/*.html"
       - mkdir -p ./assets/reveal/plugin/menu ./assets/reveal/plugin/mouse-pointer
       - git clone https://github.com/denehyg/reveal.js-menu.git ./assets/reveal/plugin/menu
       - curl -L -o ./assets/reveal/plugin/mouse-pointer/mouse-pointer.js https://raw.githubusercontent.com/caiofcm/plugin-revealjs-mouse-pointer/master/mouse-pointer.js
       - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}
       - curl -L https://github.com/highlightjs/highlight.js/archive/{{ .HIGHLIGHTJS_VERSION }}.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-{{ .HIGHLIGHTJS_VERSION }}/src/styles/
+      - curl -L https://registry.npmjs.org/mermaid/-/mermaid-{{ .MERMAID_VERSION }}.tgz | tar -xvz -C ./assets/mermaid/ package/dist --strip-components=2
+      - curl -L -o rendering/emoji/emoji.json https://unpkg.com/emojilib@latest
 
   go-get-tool:
     vars:

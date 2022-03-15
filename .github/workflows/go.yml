@@ -1,6 +1,13 @@
 name: Go
 
-on: [ push, pull_request ]
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+      - main
+  pull_request:
 
 jobs:
 
@@ -16,7 +23,7 @@ jobs:
         id: go
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           lfs: true
       
@@ -24,7 +31,7 @@ jobs:
         uses: arduino/setup-task@v1
       
       - name: Build & test
-        run: task download-reveal test
+        run: task download-assets test
       
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2

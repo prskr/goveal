@@ -5,6 +5,8 @@
 *.so
 *.dylib
 
+emoji.json
+
 # Test binary, build with `go test -c`
 *.test
 
@@ -22,6 +24,8 @@
 bin/
 
 assets/reveal/
+assets/mermaid/
+assets/twemoji/
 
 pkged.go
 

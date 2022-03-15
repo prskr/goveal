@@ -15,9 +15,11 @@
 package main
 
 import (
-	"github.com/baez90/goveal/internal/app/cmd"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	cmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		log.Errorf("Failed to run command: %v", err)
+	}
 }
