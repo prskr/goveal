@@ -3,13 +3,14 @@
 [![Actions Status](https://github.com/baez90/goveal/workflows/Go/badge.svg)](https://github.com/baez90/goveal/actions)
 
 Goveal is very small and very simple tool that reads Markdown from a given file, renders it into an HTML template and serves it as local HTTP server.
-Right now Goveal uses Reveal.js 4.2.1 to create presentations and therefore also includes all features of Reveal.js 4.2.1.
+Right now Goveal uses Reveal.js 4.3.0 to create presentations and therefore also includes all features of Reveal.js.
 
 In contrary to Reveal.js `goveal` ships with its own Markdown parser and renderer which is why some features are working slightly different from Reveal.js.
 See [Markdown](#markdown) for further details.
 
 Besides all features from Reveal.js `goveal` comes with first class support for [mermaid-js](https://mermaid-js.github.io/).
 Just inline your diagrams as code and enjoy!
+An example can be found in the [examples](examples/slides.md).
 
 ## Install
 
@@ -42,7 +43,7 @@ goveal serve ./slides.md
 ```
 
 | Param            | Description                                   | Default value           |
-| ---------------- | --------------------------------------------- | ----------------------- |
+|------------------|-----------------------------------------------|-------------------------|
 | `--host`         | Hostname the binary is listening on           | `127.0.0.1`             |
 | `--port`         | Port the binary is listening on               | `2233`                  |
 | `--config`       | Path to the config file see [config](#config) | `$HOME/goveal:./goveal` |
@@ -58,7 +59,7 @@ this:
 podman/docker run --rm -ti -v `pwd`:/work -w /work -p 2233:2233 ghcr.io/baez90/goveal:0 serve --host 0.0.0.0 slides.md
 ```
 
-By default `goveal` only listens on `127.0.0.1`. To allow traffic from outside of the container you've to change the
+By default `goveal` only listens on `127.0.0.1`. To allow traffic from outside the container you've to change the
 binding to `0.0.0.0`.
 
 ## Config
@@ -78,7 +79,7 @@ I try to keep the example up to date to cover **all** supported config options a
 ## Markdown
 
 A good point to start is the [slides.md](examples/slides.md) in the `examples` directory.
-I try to showcase everyting possible with `goveal` in this presentation.
+I try to showcase everything possible with `goveal` in this presentation.
 
 The most remarkable difference between `goveal` and the `marked` driven Reveal.js markdown is how line numbers in listings are working:
 
@@ -115,3 +116,9 @@ No page reload necessary!
 
 The sample configuration file [`./examples/goveal.yaml`](./examples/goveal.yaml) also contains a sample how to add
 custom CSS.
+
+## Emojis
+
+Aside of UTF character emojis `goveal` also supports emoji references like Github flavored markdown supports them.
+For example`:winking_face:` becomes :winking_face: .
+All supported keywords can be found [here](https://unpkg.com/emojilib@latest).

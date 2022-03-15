@@ -2,8 +2,8 @@ version: '3'
 
 vars:
   DEBUG_PORT: 2345
-  REVEALJS_VERSION: 4.2.1
-  HIGHLIGHTJS_VERSION: 11.4.0
+  REVEALJS_VERSION: 4.3.0
+  HIGHLIGHTJS_VERSION: 11.5.0
   MERMAID_VERSION: 8.14.0
   BINARY_NAME: goveal
   OUT_DIR: ./out
@@ -33,6 +33,8 @@ tasks:
       - "{{ .GOBIN }}goimports -w -local github.com/baez90/goveal ./."
 
   deps:
+    deps:
+      - download-assets
     sources:
       - go.mod
       - go.sum
@@ -99,7 +101,7 @@ tasks:
       - rm -f ./assets/reveal/plugin/menu/{bower.json,CONTRIBUTING.md,LICENSE,package.json,README.md,.gitignore,gulpfile.js,package-lock.json}
       - curl -L https://github.com/highlightjs/highlight.js/archive/{{ .HIGHLIGHTJS_VERSION }}.tar.gz | tar -xvz --strip-components=3 -C ./assets/reveal/plugin/highlight --wildcards "*.css" highlight.js-{{ .HIGHLIGHTJS_VERSION }}/src/styles/
       - curl -L https://registry.npmjs.org/mermaid/-/mermaid-{{ .MERMAID_VERSION }}.tgz | tar -xvz -C ./assets/mermaid/ package/dist --strip-components=2
-      - curl -L -o rendering/emoji/emoji.json https://raw.githubusercontent.com/muan/emojilib/main/dist/emoji-en-US.json
+      - curl -L -o rendering/emoji/emoji.json https://unpkg.com/emojilib@latest
 
   go-get-tool:
     vars:
