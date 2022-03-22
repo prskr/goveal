@@ -25,7 +25,7 @@ func init() {
 	if t, err := template.
 		New("index").
 		Funcs(sprig.FuncMap()).
-		Funcs(map[string]interface{}{
+		Funcs(map[string]any{
 			"fileId": func(fileName string) string {
 				h := fnv.New32a()
 				return hex.EncodeToString(h.Sum([]byte(path.Base(fileName))))
@@ -60,7 +60,7 @@ func RegisterViews(router *httprouter.Router, logger *log.Logger, wdfs fs.FS, md
 
 func (p *Views) IndexPage(writer http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	writer.Header().Set("Content-Type", "text/html")
-	if err := indexTmpl.ExecuteTemplate(writer, "index.gohtml", map[string]interface{}{
+	if err := indexTmpl.ExecuteTemplate(writer, "index.gohtml", map[string]any{
 		"Reveal":    p.cfg.Reveal,
 		"Rendering": p.cfg.Rendering,
 	}); err != nil {

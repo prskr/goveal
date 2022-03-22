@@ -1,6 +1,6 @@
 module github.com/baez90/goveal
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
@@ -12,6 +12,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
+	github.com/valyala/bytebufferpool v1.0.0
 	go.uber.org/multierr v1.8.0
 )
 

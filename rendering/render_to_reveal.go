@@ -78,7 +78,7 @@ func (r *RevealRenderer) handleListItem(w io.Writer, listItem *ast.ListItem) (as
 				return ast.GoToNext, false
 			}
 
-			data := map[string]interface{}{
+			data := map[string]any{
 				"Attributes": getAttributesFromChildSpan(p),
 			}
 
@@ -102,7 +102,7 @@ func (r *RevealRenderer) handleImage(w io.Writer, img *ast.Image) (ast.WalkStatu
 		}
 	}
 
-	data := map[string]interface{}{
+	data := map[string]any{
 		"ID":              hex.EncodeToString(r.Hash.Sum([]byte(path.Base(string(img.Destination))))),
 		"Attributes":      getAttributesFromChildSpan(img.GetParent()),
 		"ImageSource":     string(img.Destination),
@@ -154,7 +154,7 @@ func extractElementAttributes(htmlSpan *ast.HTMLSpan) (attrs []template.HTMLAttr
 }
 
 func renderCodeTemplate(templateName string, codeBlock *ast.CodeBlock) (output []byte, err error) {
-	data := map[string]interface{}{
+	data := map[string]any{
 		//nolint:gosec // need to embed the code in original format without escaping
 		"Code":        template.HTML(codeBlock.Literal),
 		"LineNumbers": lineNumbers(codeBlock.Attribute),
