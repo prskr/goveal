@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/fsnotify/fsnotify v1.5.4
-	github.com/gomarkdown/markdown v0.0.0-20220419181919-412bcf14cd2e
+	github.com/gomarkdown/markdown v0.0.0-20220506183847-567d164e0ce1
 	github.com/google/uuid v1.3.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mitchellh/go-homedir v1.1.0
