@@ -8,7 +8,7 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/valyala/bytebufferpool"
 
-	"github.com/baez90/goveal/config"
+	"code.icb4dc0.de/prskr/goveal/config"
 )
 
 const (

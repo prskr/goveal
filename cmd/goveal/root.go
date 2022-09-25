@@ -20,7 +20,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/baez90/goveal/config"
+	"code.icb4dc0.de/prskr/goveal/config"
 )
 
 //nolint:lll // explanations are rather long

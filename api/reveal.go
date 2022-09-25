@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/baez90/goveal/assets"
-	"github.com/baez90/goveal/fs"
-	"github.com/baez90/goveal/web"
+	"code.icb4dc0.de/prskr/goveal/assets"
+	"code.icb4dc0.de/prskr/goveal/fs"
+	"code.icb4dc0.de/prskr/goveal/web"
 )
 
 func FileSystemMiddleware(fallthroughHandler http.Handler, wdfs fs.FS) http.Handler {

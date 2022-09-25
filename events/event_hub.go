@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/baez90/goveal/fs"
+	"code.icb4dc0.de/prskr/goveal/fs"
 )
 
 const (

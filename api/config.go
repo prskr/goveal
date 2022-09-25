@@ -6,7 +6,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/baez90/goveal/config"
+	"code.icb4dc0.de/prskr/goveal/config"
 )
 
 type ConfigAPI struct {

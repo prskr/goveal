@@ -14,10 +14,10 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/multierr"
 
-	"github.com/baez90/goveal/api"
-	"github.com/baez90/goveal/config"
-	"github.com/baez90/goveal/events"
-	"github.com/baez90/goveal/fs"
+	"code.icb4dc0.de/prskr/goveal/api"
+	"code.icb4dc0.de/prskr/goveal/config"
+	"code.icb4dc0.de/prskr/goveal/events"
+	"code.icb4dc0.de/prskr/goveal/fs"
 )
 
 const (

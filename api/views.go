@@ -13,10 +13,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.uber.org/multierr"
 
-	"github.com/baez90/goveal/config"
-	"github.com/baez90/goveal/fs"
-	"github.com/baez90/goveal/rendering"
-	"github.com/baez90/goveal/web"
+	"code.icb4dc0.de/prskr/goveal/config"
+	"code.icb4dc0.de/prskr/goveal/fs"
+	"code.icb4dc0.de/prskr/goveal/rendering"
+	"code.icb4dc0.de/prskr/goveal/web"
 )
 
 var indexTmpl *template.Template

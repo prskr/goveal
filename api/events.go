@@ -11,7 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/baez90/goveal/events"
+	"code.icb4dc0.de/prskr/goveal/events"
 )
 
 type ContentEventHandler chan events.ContentEvent

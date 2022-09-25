@@ -1,4 +1,4 @@
-module github.com/baez90/goveal
+module code.icb4dc0.de/prskr/goveal
 
 go 1.19
 

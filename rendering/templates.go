@@ -11,7 +11,7 @@ import (
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/valyala/bytebufferpool"
 
-	"github.com/baez90/goveal/rendering/emoji"
+	"code.icb4dc0.de/prskr/goveal/rendering/emoji"
 )
 
 var (
