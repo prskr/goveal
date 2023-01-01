@@ -5,7 +5,7 @@ linters-settings:
     lines: 100
     statements: 50
   gci:
-    local-prefixes: github.com/baez90/goveal
+    local-prefixes: code.icb4dc0.de/prskr/goveal
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -24,7 +24,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: github.com/baez90/goveal
+    local-prefixes: code.icb4dc0.de/prskr/goveal
   golint:
     min-confidence: 0
   gomnd:
@@ -58,47 +58,52 @@ linters:
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
-    - deadcode
+    - contextcheck
     - dogsled
     - dupl
     - errcheck
+    - errchkjson
+    - errname
+    - errorlint
     - exhaustive
     - exportloopref
     - funlen
     - gocognit
     - goconst
-    - gocritic
+    # - gocritic
     - gocyclo
     - godox
     - gofumpt
     - goimports
+    - gomoddirectives
     - gomnd
     - gosec
     - gosimple
     - govet
     - importas
     - ineffassign
+    # - ireturn - enable later
     - lll
     - misspell
     - nakedret
     - nestif
+    - nilnil
     - noctx
     - nolintlint
     - paralleltest
     - prealloc
+    - predeclared
     - promlinter
     - staticcheck
-    - structcheck
     - stylecheck
     - testpackage
     - thelper
-    - typecheck
+    # - typecheck
     - unconvert
     - unparam
-    - varcheck
     - whitespace
-
-    #- unused
+    - unused
+    - wastedassign
 
 issues:
   # Excluding configuration per-path, per-linter, per-text and per-source
@@ -118,6 +123,3 @@ run:
   skip-files:
     - ".*\\.pb\\.go$"
     - ".*.mock.\\.go$"
-
-service:
-  golangci-lint-version: 1.43.x # use the fixed version to not introduce new linters unexpectedly

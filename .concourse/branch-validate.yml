@@ -1,0 +1,69 @@
+---
+resources:
+  - name: goveal.git
+    type: git
+    icon: github
+    source:
+      uri: https://code.icb4dc0.de/prskr/goveal.git
+      branch: ((branch))
+
+  - name: templates.git
+    type: git
+    icon: github
+    source:
+        uri: https://code.icb4dc0.de/prskr/pipeline-templates.git
+
+jobs:
+  - name: lint
+    plan:
+      - get: goveal.git
+        trigger: true
+      - get: templates.git
+      - task: lint
+        file: goveal.git/.concourse/tasks/lint.yml
+        input_mapping: {repo: goveal.git}
+        on_success:
+          task: report-success
+          file: templates.git/tasks/gitea-status.yml
+          input_mapping: {repo: goveal.git}
+          vars:
+            project_path: prskr/goveal
+            context: concourse-ci/lint/golangci-lint
+            description: Lint Go files
+            state: success
+        on_failure:
+          task: report-failure
+          file: templates.git/tasks/gitea-status.yml
+          input_mapping: {repo: goveal.git}
+          vars:
+            project_path: prskr/goveal
+            context: concourse-ci/lint/golangci-lint
+            description: Lint Go files
+            state: failure
+  - name: test
+    plan:
+      - get: goveal.git
+        trigger: true
+      - get: templates.git
+      - task: test
+        file: goveal.git/.concourse/tasks/test.yml
+        privileged: true
+        input_mapping: {repo: goveal.git}
+        on_success:
+          task: report-success
+          file: templates.git/tasks/gitea-status.yml
+          input_mapping: {repo: goveal.git}
+          vars:
+            project_path: prskr/goveal
+            context: concourse-ci/test/gotestsum
+            description: Run unit tests
+            state: success
+        on_failure:
+          task: report-failure
+          file: templates.git/tasks/gitea-status.yml
+          input_mapping: {repo: goveal.git}
+          vars:
+            project_path: prskr/goveal
+            context: concourse-ci/test/gotestsum
+            description: Run unit tests
+            state: failure
