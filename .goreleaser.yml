@@ -1,6 +1,7 @@
 project_name: goveal
 builds:
-  - main: ./cmd/goveal/
+  - id: goveal
+    main: ./cmd/goveal/
     binary: goveal
     goos:
       - linux
@@ -27,17 +28,19 @@ release:
     name: goveal
   mode: replace
 
-dockers:
+kos:
   - id: goveal
-    goos: linux
-    goarch: amd64
-    goarm: ''
-    ids:
-      - goveal
-    image_templates:
-      - ghcr.io/baez90/goveal:{{ .Tag }}
-      - ghcr.io/baez90/goveal:{{ .Major }}
-    dockerfile: ./build/docker/goveal.dockerfile
+    build: goveal
+    base_image: gcr.io/distroless/static:nonroot
+    repository: code.icb4dc0.de/prskr/goveal
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    tags:
+      - latest
+      - '{{.Tag}}'
+    bare: true
+    base_import_paths: true
 
 archives:
   - replacements:
