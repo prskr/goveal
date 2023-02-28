@@ -1,0 +1,56 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+trigger:
+  event:
+    - push
+    - pull_request
+    - tag
+
+steps:
+  - name: Lint
+    image: docker.io/golangci/golangci-lint:latest
+    environment:
+      GO111MODULE: "on"
+      CGO_ENABLED: "0"
+      GOMEMLIMIT: "1150MiB"
+    commands:
+      - golangci-lint run -v
+
+  - name: Test
+    image: docker.io/golang:1.20-bullseye
+    environment:
+      GO111MODULE: "on"
+      CGO_ENABLED: "1"
+    commands:
+      - go install gotest.tools/gotestsum@latest
+      - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+      - task test
+
+---
+kind: pipeline
+type: docker
+name: housekeeping
+
+trigger:
+  event:
+    - cron
+  cron:
+    - housekeeping
+
+steps:
+  - name: Renovate
+    image: code.icb4dc0.de/prskr/ci-images/renovate:latest
+    commands:
+      - renovate "${DRONE_REPO}"
+    environment:
+      RENOVATE_TOKEN:
+        from_secret: gitea_token
+      GITHUB_COM_TOKEN:
+        from_secret: github_token
+      RENOVATE_PLATFORM: gitea
+      RENOVATE_AUTODISCOVER: "false"
+      RENOVATE_ENDPOINT: https://code.icb4dc0.de/api/v1
+      LOG_LEVEL: info
