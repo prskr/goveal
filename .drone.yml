@@ -16,6 +16,9 @@ steps:
       GO111MODULE: "on"
       CGO_ENABLED: "0"
       GOMEMLIMIT: "1150MiB"
+    volumes:
+      - name: go-cache
+        path: /go
     commands:
       - golangci-lint run -v
 
@@ -25,6 +28,9 @@ steps:
     environment:
       GO111MODULE: "on"
       CGO_ENABLED: "1"
+    volumes:
+      - name: go-cache
+        path: /go
     commands:
       - go install gotest.tools/gotestsum@latest
       - sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
@@ -52,6 +58,10 @@ steps:
         path: /go
     commands:
       - goreleaser release --clean
+
+volumes:
+  - name: go-cache
+    temp: { }
 
 ---
 kind: pipeline
