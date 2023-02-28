@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/hex"
+	"errors"
 	"hash/fnv"
 	"html/template"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
-	"go.uber.org/multierr"
 
 	"code.icb4dc0.de/prskr/goveal/config"
 	"code.icb4dc0.de/prskr/goveal/fs"
@@ -77,7 +77,11 @@ func (p *Views) RenderedMarkdown(writer http.ResponseWriter, _ *http.Request, _ 
 		_, _ = writer.Write([]byte(err.Error()))
 		return
 	}
-	defer multierr.AppendInvoke(&err, multierr.Close(f))
+
+	defer func() {
+		err = errors.Join(err, f.Close())
+	}()
+
 	data, err := io.ReadAll(f)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)

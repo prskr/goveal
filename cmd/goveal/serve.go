@@ -12,7 +12,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"go.uber.org/multierr"
 
 	"code.icb4dc0.de/prskr/goveal/api"
 	"code.icb4dc0.de/prskr/goveal/config"
@@ -41,7 +40,9 @@ var (
 				return err
 			}
 
-			defer multierr.AppendInvoke(&err, multierr.Close(wdfs))
+			defer func() {
+				err = errors.Join(err, wdfs.Close())
+			}()
 
 			var mdFile fs.File
 			if mdFile, err = wdfs.Open(args[0]); err != nil {

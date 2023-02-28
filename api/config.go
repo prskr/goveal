@@ -31,6 +31,6 @@ func (a *ConfigAPI) MermaidConfig(writer http.ResponseWriter, _ *http.Request, _
 	writer.Header().Set("Content-Type", "application/json")
 	enc := json.NewEncoder(writer)
 	if err := enc.Encode(a.cfg.Mermaid); err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
 	}
 }
