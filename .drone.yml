@@ -58,6 +58,9 @@ steps:
         path: /go
     commands:
       - goreleaser release --clean
+    environment:
+        GITEA_TOKEN:
+            from_secret: gitea_token
 
 volumes:
   - name: go-cache

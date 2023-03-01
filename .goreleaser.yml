@@ -23,8 +23,8 @@ builds:
         goarm: '7'
 
 release:
-  github:
-    owner: baez90
+  gitea:
+    owner: prskr
     name: goveal
   mode: replace
 
