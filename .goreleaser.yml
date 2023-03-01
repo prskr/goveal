@@ -1,4 +1,7 @@
 project_name: goveal
+gitea_urls:
+  api: https://code.icb4dc0.de/api/v1
+  download: https://code.icb4dc0.de
 builds:
   - id: goveal
     main: ./cmd/goveal/

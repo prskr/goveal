@@ -57,11 +57,16 @@ steps:
       - name: go-cache
         path: /go
     commands:
+      - apk add -U --no-cache git-lfs
+      - git lfs install
       - git fetch --tags
+      - git lfs pull
+      - docker login -u prskr -p "$${GITEA_TOKEN}" code.icb4dc0.de
       - goreleaser release --clean
     environment:
         GITEA_TOKEN:
             from_secret: gitea_token
+    network_mode: host
 
 volumes:
   - name: go-cache
