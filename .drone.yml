@@ -57,6 +57,7 @@ steps:
       - name: go-cache
         path: /go
     commands:
+      - git fetch --tags
       - goreleaser release --clean
     environment:
         GITEA_TOKEN:
