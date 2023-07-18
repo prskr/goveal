@@ -8,6 +8,8 @@ platform:
   arch: arm64
 
 trigger:
+  branch: 
+  - main
   event:
     - push
     - pull_request
