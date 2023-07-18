@@ -3,6 +3,10 @@ kind: pipeline
 type: docker
 name: default
 
+platform:
+  os: linux
+  arch: arm64
+
 trigger:
   event:
     - push
@@ -76,6 +80,10 @@ volumes:
 kind: pipeline
 type: docker
 name: housekeeping
+
+platform:
+  os: linux
+  arch: arm64
 
 trigger:
   event:
