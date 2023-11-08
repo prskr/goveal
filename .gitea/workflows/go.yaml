@@ -1,0 +1,36 @@
+name: Go build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+          lfs: 'true'
+          fetch-tags: 'true'
+      - name: Setup Go 1.21.x
+        uses: actions/setup-go@v4
+        with:
+          # Semantic version range syntax or exact version of Go
+          go-version: '1.21.x'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - run: |
+          go install gotest.tools/gotestsum@latest
+          task test
+      - uses: goreleaser/goreleaser-action@v4
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean --snapshot
